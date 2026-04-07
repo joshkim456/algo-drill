@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { TOPIC_LABELS } from '../../data/schema'
-import type { Topic, ImplementationQuestion, TableTraceQuestion } from '../../data/schema'
+import type { Topic, ImplementationQuestion, TableTraceQuestion, CanvasTraceQuestion } from '../../data/schema'
 import { useStorage } from '../../hooks/useStorage'
 import { useRound } from '../../hooks/useRound'
 import { useKeyboard } from '../../hooks/useKeyboard'
@@ -9,6 +9,7 @@ import { gradeTable } from '../../utils/gradeTable'
 import QuestionCard from './QuestionCard'
 import CodeEditor from './CodeEditor'
 import TraceTable from './TraceTable'
+import TreeCanvas from './TreeCanvas'
 import RevealPanel from './RevealPanel'
 import GradeButtons from './GradeButtons'
 import HintButton from './HintButton'
@@ -205,9 +206,10 @@ export default function RoundScreen() {
           {isTraceTable && tableQ ? (
             <TraceTable question={tableQ} onSubmit={handleTableSubmit} />
           ) : isTraceCanvas ? (
-            <div className="p-8 rounded-lg bg-[#1a1d27] border border-[#2e303a] text-slate-500 text-center">
-              Canvas tree builder — coming in Phase 6
-            </div>
+            <TreeCanvas
+              question={q as CanvasTraceQuestion}
+              onSubmit={handleSubmit}
+            />
           ) : isConceptual ? (
             <textarea
               value={userCode}
@@ -292,26 +294,33 @@ export default function RoundScreen() {
         </div>
       )}
 
-      {/* ── Revealed: Trace Canvas (placeholder) ── */}
+      {/* ── Revealed: Trace Canvas ── */}
       {round.state.phase === 'revealed' && isTraceCanvas && (
         <div>
-          <div className="p-8 rounded-lg bg-[#1a1d27] border border-[#2e303a] text-slate-500 text-center">
-            Canvas comparison — coming in Phase 6
-          </div>
+          <TreeCanvas
+            question={q as CanvasTraceQuestion}
+            onSubmit={() => {}}
+            showSolution
+          />
           <div className="mt-4 flex gap-3">
             <button
               onClick={round.gradeGotIt}
               className="flex-1 py-3 rounded-lg bg-green-600 hover:bg-green-500 text-white font-medium transition-colors"
             >
-              Got it
+              Got it <span className="text-green-200 text-sm ml-1">(→ or 1)</span>
             </button>
             <button
               onClick={round.gradeMissed}
               className="flex-1 py-3 rounded-lg bg-red-600 hover:bg-red-500 text-white font-medium transition-colors"
             >
-              Missed it
+              Missed it <span className="text-red-200 text-sm ml-1">(← or 2)</span>
             </button>
           </div>
+          {round.canUndo && (
+            <button onClick={round.undo} className="mt-2 text-sm text-slate-500 hover:text-slate-300 transition-colors">
+              Undo (U)
+            </button>
+          )}
         </div>
       )}
     </div>
