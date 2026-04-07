@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { TOPIC_LABELS } from '../../data/schema'
 import type { Topic, ImplementationQuestion, TableTraceQuestion, CanvasTraceQuestion } from '../../data/schema'
 import { useStorage } from '../../hooks/useStorage'
 import { useRound } from '../../hooks/useRound'
 import { useKeyboard } from '../../hooks/useKeyboard'
 import { gradeTable } from '../../utils/gradeTable'
+import { getById } from '../../data/questionBank'
 import QuestionCard from './QuestionCard'
 import CodeEditor from './CodeEditor'
 import TraceTable from './TraceTable'
@@ -19,6 +20,7 @@ import { formatCopyForClaude } from '../../utils/clipboard'
 export default function RoundScreen() {
   const { section, topic } = useParams<{ section: string; topic: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const storage = useStorage()
   const round = useRound(storage)
   const language = storage.getLanguage()
@@ -30,9 +32,24 @@ export default function RoundScreen() {
   const [tableValues, setTableValues] = useState<string[][] | null>(null)
   const [tableResult, setTableResult] = useState<ReturnType<typeof gradeTable> | null>(null)
 
-  // Start round on mount
+  // Start round on mount — support resume and custom mode via location state
   useEffect(() => {
-    if (topic && section) {
+    const navState = location.state as { resume?: boolean; questionIds?: string[]; label?: string } | null
+
+    if (navState?.resume) {
+      const didResume = round.resumeRound()
+      if (!didResume && topic && section) {
+        round.startRound(topic as Topic, section as 'implementation' | 'trace')
+      }
+    } else if (navState?.questionIds) {
+      const questions = navState.questionIds.map(id => getById(id)).filter(Boolean) as any[]
+      if (questions.length > 0) {
+        round.startCustomRound(questions, {
+          topic: (topic ?? questions[0].topic) as Topic,
+          section: (section ?? 'implementation') as 'implementation' | 'trace',
+        })
+      }
+    } else if (topic && section) {
       round.startRound(topic as Topic, section as 'implementation' | 'trace')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -159,7 +176,7 @@ export default function RoundScreen() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <h1 className="text-lg font-semibold text-white">
-            {TOPIC_LABELS[topic as Topic]}
+            {(location.state as any)?.label ?? TOPIC_LABELS[topic as Topic]}
           </h1>
           <span className="text-sm text-slate-500">
             {round.state.currentIndex + 1} of {round.state.questions.length}

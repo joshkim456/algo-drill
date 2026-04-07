@@ -25,7 +25,7 @@ export interface SessionStats {
 }
 
 // ── Serializable mid-round state ──
-interface MidRoundState {
+export interface MidRoundState {
   topic: Topic
   section: Section
   queueIds: string[]
@@ -323,10 +323,46 @@ export function useRound(storage: StorageAPI) {
     ? state.questions[state.currentIndex]
     : null
 
+  // ── Start a custom round with a pre-built question list ──
+  const startCustomRound = useCallback((questions: Question[], label: { topic: Topic; section: Section }) => {
+    if (questions.length === 0) {
+      setState({
+        questions: [],
+        currentIndex: 0,
+        phase: 'complete',
+        hintsRevealed: 0,
+        stats: { questionsReviewed: 0, gotItCount: 0, missedCount: 0, hintsUsed: 0, startTime: Date.now() },
+        topic: label.topic,
+        section: label.section,
+      })
+      return
+    }
+
+    historyRef.current = []
+    storage.clearMidRound()
+
+    setState({
+      questions: questions.slice(0, ROUND_SIZE),
+      currentIndex: 0,
+      phase: 'answering',
+      hintsRevealed: 0,
+      stats: {
+        questionsReviewed: 0,
+        gotItCount: 0,
+        missedCount: 0,
+        hintsUsed: 0,
+        startTime: Date.now(),
+      },
+      topic: label.topic,
+      section: label.section,
+    })
+  }, [storage])
+
   return {
     state,
     currentQuestion,
     startRound,
+    startCustomRound,
     resumeRound,
     submitAnswer,
     revealHint,
