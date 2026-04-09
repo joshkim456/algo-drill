@@ -19,10 +19,10 @@ export const heapQuestions: (ImplementationQuestion | TableTraceQuestion)[] = [
       "while k > 1 and a[k] > a[k/2]:\n  swap(a[k], a[k/2])\n  k = k / 2",
     ],
     solutions: {
-      pseudocode: `function swim(a[], k):
-  while k > 1 and a[k] > a[k/2]:
-    swap(a[k], a[k/2])
-    k = k / 2`,
+      pseudocode: `swim(i):
+  while (i > 1 && a[i/2]<a[i])
+    swap(a[i], a[i/2]);
+    i = i/2;`,
       python: `def swim(a: list, k: int) -> None:
     while k > 1 and a[k] > a[k // 2]:
         a[k], a[k // 2] = a[k // 2], a[k]
@@ -49,15 +49,13 @@ export const heapQuestions: (ImplementationQuestion | TableTraceQuestion)[] = [
       "while 2*k <= n:\n  j = 2*k\n  if j < n and a[j] < a[j+1]: j++\n  if a[k] >= a[j]: break\n  swap(a[k], a[j])\n  k = j",
     ],
     solutions: {
-      pseudocode: `function sink(a[], k, n):
-  while 2*k <= n:
-    j = 2*k
-    if j < n and a[j] < a[j+1]:
-      j = j + 1
-    if a[k] >= a[j]:
-      break
-    swap(a[k], a[j])
-    k = j`,
+      pseudocode: `sink(i):
+  while (2*i <= N)
+    j = 2*i;
+    if (j<N && a[j]<a[j+1]) j++;
+    if (a[i]>=a[j]) break;
+    swap(a[i], a[j]);
+    i = j;`,
       python: `def sink(a: list, k: int, n: int) -> None:
     while 2 * k <= n:
         j = 2 * k
@@ -89,11 +87,9 @@ export const heapQuestions: (ImplementationQuestion | TableTraceQuestion)[] = [
       "n = n + 1\na[n] = key\nswim(a, n)\nreturn n",
     ],
     solutions: {
-      pseudocode: `function insert(a[], n, key):
-  n = n + 1
-  a[n] = key
-  swim(a, n)
-  return n`,
+      pseudocode: `enqueue(key):
+  a[++N]=key;
+  swim(N);`,
       python: `def insert(a: list, n: int, key) -> int:
     n += 1
     if n >= len(a):
@@ -124,12 +120,12 @@ export const heapQuestions: (ImplementationQuestion | TableTraceQuestion)[] = [
       "max = a[1]\nswap(a[1], a[n])\nn = n - 1\nsink(a, 1, n)\nreturn max, n",
     ],
     solutions: {
-      pseudocode: `function delMax(a[], n):
-  max = a[1]
-  swap(a[1], a[n])
-  n = n - 1
-  sink(a, 1, n)
-  return max, n`,
+      pseudocode: `dequeue():
+  max=a[1];
+  swap(a[1], a[N]);
+  a[N--]=null;
+  sink(1);
+  return max;`,
       python: `def del_max(a: list, n: int) -> tuple:
     max_val = a[1]
     a[1], a[n] = a[n], a[1]
@@ -158,9 +154,8 @@ export const heapQuestions: (ImplementationQuestion | TableTraceQuestion)[] = [
       "for k = n/2 down to 1:\n  sink(a, k, n)",
     ],
     solutions: {
-      pseudocode: `function buildHeap(a[], n):
-  for k = n/2 down to 1:
-    sink(a, k, n)`,
+      pseudocode: `for (k = N/2; k >= 1; k--)
+  sink(k);`,
       python: `def build_heap(a: list, n: int) -> None:
     for k in range(n // 2, 0, -1):
         sink(a, k, n)`,

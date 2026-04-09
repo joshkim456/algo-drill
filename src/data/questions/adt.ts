@@ -81,27 +81,14 @@ export const adtQuestions: ImplementationQuestion[] = [
       "function push(item):\n  oldHead = head\n  head = new Node(item)\n  head.next = oldHead\n  n = n + 1\nfunction pop():\n  item = head.item\n  head = head.next\n  n = n - 1\n  return item",
     ],
     solutions: {
-      pseudocode: `class LinkedStack:
-  head = null
-  n = 0
+      pseudocode: `push (newNode):
+  newNode.next = head
+  head = newNode
 
-  function push(item):
-    oldHead = head
-    head = new Node(item)
-    head.next = oldHead
-    n = n + 1
-
-  function pop():
-    item = head.item
-    head = head.next
-    n = n - 1
-    return item
-
-  function isEmpty():
-    return head == null
-
-  function size():
-    return n`,
+pop ():
+  targetNode = head
+  head = head.next
+  return targetNode`,
       python: `class Node:
     def __init__(self, item):
         self.item = item
@@ -232,25 +219,15 @@ class LinkedStack:
       "dequeue: item = head.item; head = head.next; if head == null: tail = null; return item",
     ],
     solutions: {
-      pseudocode: `class LinkedQueue:
-  head = null
-  tail = null
+      pseudocode: `enqueue (newNode):
+  tail.next = newNode
+  newNode.next = null
+  tail = newNode
 
-  function enqueue(item):
-    oldTail = tail
-    tail = new Node(item)
-    tail.next = null
-    if head == null:
-      head = tail
-    else:
-      oldTail.next = tail
-
-  function dequeue():
-    item = head.item
-    head = head.next
-    if head == null:
-      tail = null
-    return item`,
+dequeue ():
+  targetNode = head
+  head = head.next
+  return targetNode`,
       python: `class Node:
     def __init__(self, item):
         self.item = item

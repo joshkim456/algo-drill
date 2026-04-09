@@ -19,12 +19,10 @@ export const sortingQuestions: (ImplementationQuestion | TableTraceQuestion)[] =
       "for i = 1 to n-1:\n  j = i\n  while j > 0 and a[j] < a[j-1]: swap a[j], a[j-1]; j--",
     ],
     solutions: {
-      pseudocode: `function insertionSort(a[], n):
-  for i = 1 to n-1:
-    j = i
-    while j > 0 and a[j] < a[j-1]:
-      swap(a[j], a[j-1])
-      j = j - 1`,
+      pseudocode: `i++
+for(j=i; j>0; j--)
+     if (a[j] < a[j-1])
+          swap(a[j], a[j-1])`,
       python: `def insertion_sort(a: list) -> None:
     for i in range(1, len(a)):
         j = i
@@ -53,13 +51,11 @@ export const sortingQuestions: (ImplementationQuestion | TableTraceQuestion)[] =
       "for i = 0 to n-2:\n  minIdx = i\n  for j = i+1 to n-1:\n    if a[j] < a[minIdx]: minIdx = j\n  swap(a[i], a[minIdx])",
     ],
     solutions: {
-      pseudocode: `function selectionSort(a[], n):
-  for i = 0 to n-2:
-    minIdx = i
-    for j = i+1 to n-1:
-      if a[j] < a[minIdx]:
-        minIdx = j
-    swap(a[i], a[minIdx])`,
+      pseudocode: `i++
+min=i
+for(j=i+1; j<N; j++)
+     if (a[j] < a[min]) min = j
+swap(a[i], a[min])`,
       python: `def selection_sort(a: list) -> None:
     n = len(a)
     for i in range(n - 1):
@@ -90,24 +86,25 @@ export const sortingQuestions: (ImplementationQuestion | TableTraceQuestion)[] =
       "merge(a, aux, lo, mid, hi):\n  copy a[lo..hi] to aux[lo..hi]\n  i = lo, j = mid+1\n  for k = lo to hi:\n    if i > mid: a[k] = aux[j++]\n    elif j > hi: a[k] = aux[i++]\n    elif aux[j] < aux[i]: a[k] = aux[j++]\n    else: a[k] = aux[i++]",
     ],
     solutions: {
-      pseudocode: `function mergeSort(a[], aux[], lo, hi):
-  if hi <= lo:
-    return
-  mid = lo + (hi - lo) / 2
-  mergeSort(a, aux, lo, mid)
-  mergeSort(a, aux, mid+1, hi)
-  merge(a, aux, lo, mid, hi)
+      pseudocode: `sort(a[], aux[], lo, hi):
+     if (hi <= lo) return;
+     mid = lo + (hi - lo) / 2;
+     sort(a, aux, lo, mid);
+     sort(a, aux, mid+1, hi);
+     merge(a, aux, lo, mid, hi);
 
-function merge(a[], aux[], lo, mid, hi):
-  for k = lo to hi:
-    aux[k] = a[k]
-  i = lo
-  j = mid + 1
-  for k = lo to hi:
-    if i > mid:           a[k] = aux[j]; j = j + 1
-    else if j > hi:       a[k] = aux[i]; i = i + 1
-    else if aux[j] < aux[i]: a[k] = aux[j]; j = j + 1
-    else:                 a[k] = aux[i]; i = i + 1`,
+sort(a, aux, 0, a.length-1)
+
+merge(a[], aux[], lo, mid, hi):
+     for (k = lo; k <= hi; k++)
+          aux[k] = a[k];
+     i = lo;
+     j = mid+1;
+     for (k = lo; k <= hi; k++)
+          if (i > mid)              a[k] = aux[j]; j++;
+          else if (j > hi)          a[k] = aux[i]; i++;
+          else if (aux[j] < aux[i]) a[k] = aux[j]; j++;
+          else                      a[k] = aux[i]; i++;`,
       python: `def merge_sort(a: list) -> None:
     aux = [0] * len(a)
     _sort(a, aux, 0, len(a) - 1)
@@ -155,16 +152,16 @@ def _merge(a: list, aux: list, lo: int, mid: int, hi: int) -> None:
       "Copy a[lo..hi] to aux\ni = lo, j = mid+1\nfor k = lo to hi:\n  if i > mid: a[k] = aux[j++]\n  elif j > hi: a[k] = aux[i++]\n  elif aux[j] < aux[i]: a[k] = aux[j++]\n  else: a[k] = aux[i++]",
     ],
     solutions: {
-      pseudocode: `function merge(a[], aux[], lo, mid, hi):
-  for k = lo to hi:
-    aux[k] = a[k]
-  i = lo
-  j = mid + 1
-  for k = lo to hi:
-    if i > mid:           a[k] = aux[j]; j = j + 1
-    else if j > hi:       a[k] = aux[i]; i = i + 1
-    else if aux[j] < aux[i]: a[k] = aux[j]; j = j + 1
-    else:                 a[k] = aux[i]; i = i + 1`,
+      pseudocode: `merge(a[], aux[], lo, mid, hi):
+     for (k = lo; k <= hi; k++)
+          aux[k] = a[k];
+     i = lo;
+     j = mid+1;
+     for (k = lo; k <= hi; k++)
+          if (i > mid)              a[k] = aux[j]; j++;
+          else if (j > hi)          a[k] = aux[i]; i++;
+          else if (aux[j] < aux[i]) a[k] = aux[j]; j++;
+          else                      a[k] = aux[i]; i++;`,
       python: `def merge(a: list, aux: list, lo: int, mid: int, hi: int) -> None:
     for k in range(lo, hi + 1):
         aux[k] = a[k]
@@ -257,29 +254,28 @@ def _merge(a: list, aux: list, lo: int, mid: int, hi: int) -> None:
       "partition: pivot = a[lo], i = lo, j = hi+1\nloop: i++ while a[i] < pivot; j-- while a[j] > pivot; if i >= j break; swap(a[i], a[j])\nswap(a[lo], a[j]); return j",
     ],
     solutions: {
-      pseudocode: `function quickSort(a[], lo, hi):
-  if hi <= lo:
-    return
-  j = partition(a, lo, hi)
-  quickSort(a, lo, j - 1)
-  quickSort(a, j + 1, hi)
+      pseudocode: `sort(a[], lo, hi):
+     if (hi <= lo) return;
+     j = partition(a, lo, hi);
+     sort(a, lo, j-1);
+     sort(a, j+1, hi);
 
-function partition(a[], lo, hi):
-  pivot = a[lo]
-  i = lo
-  j = hi + 1
-  while true:
-    i = i + 1
-    while i <= hi and a[i] < pivot:
-      i = i + 1
-    j = j - 1
-    while j >= lo and a[j] > pivot:
-      j = j - 1
-    if i >= j:
-      break
-    swap(a[i], a[j])
-  swap(a[lo], a[j])
-  return j`,
+randomShuffle(a);
+sort(a, 0, a.length-1);
+
+partition(a[], lo, hi):
+     i = lo;
+     j = hi+1;
+     p = a[lo]
+     while (true)
+          while (a[++i] < p)
+               if (i == hi) break;
+          while (p < a[--j])
+               if (j == lo) break;
+          if (i >= j) break;
+          swap(a[i], a[j]);
+     swap(a[lo], a[j]);
+     return j;`,
       python: `def quick_sort(a: list) -> None:
     _qsort(a, 0, len(a) - 1)
 
@@ -328,22 +324,19 @@ def _partition(a: list, lo: int, hi: int) -> int:
       "pivot = a[lo]\ni = lo, j = hi + 1\nloop:\n  i++; while a[i] < pivot: i++\n  j--; while a[j] > pivot: j--\n  if i >= j: break\n  swap(a[i], a[j])\nswap(a[lo], a[j])\nreturn j",
     ],
     solutions: {
-      pseudocode: `function partition(a[], lo, hi):
-  pivot = a[lo]
-  i = lo
-  j = hi + 1
-  while true:
-    i = i + 1
-    while i <= hi and a[i] < pivot:
-      i = i + 1
-    j = j - 1
-    while j >= lo and a[j] > pivot:
-      j = j - 1
-    if i >= j:
-      break
-    swap(a[i], a[j])
-  swap(a[lo], a[j])
-  return j`,
+      pseudocode: `partition(a[], lo, hi):
+     i = lo;
+     j = hi+1;
+     p = a[lo]
+     while (true)
+          while (a[++i] < p)
+               if (i == hi) break;
+          while (p < a[--j])
+               if (j == lo) break;
+          if (i >= j) break;
+          swap(a[i], a[j]);
+     swap(a[lo], a[j]);
+     return j;`,
       python: `def partition(a: list, lo: int, hi: int) -> int:
     pivot = a[lo]
     i = lo + 1

@@ -19,40 +19,36 @@ export const hashTableQuestions: (ImplementationQuestion | TableTraceQuestion)[]
       "put: i = hash(key) % M; node = table[i]; while node != null: if node.key == key: node.val = val; return; node = node.next; table[i] = new Node(key, val, table[i])",
     ],
     solutions: {
-      pseudocode: `function put(table[], M, key, val):
-  i = hash(key) % M
-  node = table[i]
-  while node != null:
-    if node.key == key:
-      node.val = val
-      return
-    node = node.next
-  table[i] = new Node(key, val, table[i])   // prepend
+      pseudocode: `class SeparateChainingHashTable:
+    class Node:
+        def __init__(self, key, value):
+            self.key = key
+            self.value = value
+            self.next = None
 
-function get(table[], M, key):
-  i = hash(key) % M
-  node = table[i]
-  while node != null:
-    if node.key == key:
-      return node.val
-    node = node.next
-  return null
+    M = 97  # number of chains
+    ht = Node[M]  # array of chains
 
-function delete(table[], M, key):
-  i = hash(key) % M
-  if table[i] == null:
-    return
-  if table[i].key == key:
-    table[i] = table[i].next
-    return
-  prev = table[i]
-  curr = prev.next
-  while curr != null:
-    if curr.key == key:
-      prev.next = curr.next
-      return
-    prev = curr
-    curr = curr.next`,
+    def hash(self, key):
+        return key % self.M
+
+    def get(self, key):
+        i = self.hash(self, key)
+        x = self.ht[i]
+        while (x!=None):
+            if (x.key==key) return x.value
+            else x = x.next
+        return None
+
+    def put(self, key, value):
+        i = self.hash(self, key)
+        x = self.ht[i]
+        while (x!=None):
+            if (x.key==key)
+                x.value = value
+                return
+            else x = x.next
+        self.ht[i] = Node(key, value, self.ht[i])`,
       python: `class Node:
     def __init__(self, key, val, next_node=None):
         self.key = key
@@ -115,45 +111,31 @@ def delete(table: list, M: int, key):
       "delete: set keys[i] = null, vals[i] = null. Then j = (i+1) % M; while keys[j] != null: save key/val, set keys[j] = null, vals[j] = null, re-put the saved key/val; j = (j+1) % M.",
     ],
     solutions: {
-      pseudocode: `function put(keys[], vals[], M, key, val):
-  i = hash(key) % M
-  while keys[i] != null:
-    if keys[i] == key:
-      vals[i] = val
-      return
-    i = (i + 1) % M
-  keys[i] = key
-  vals[i] = val
+      pseudocode: `class LinearProbingHashTable:
+    M = N*2 + 1  #rule of thumb
+    ht_keys = Key[M]  # array of keys
+    ht_values = Value[M]  # array of values
 
-function get(keys[], vals[], M, key):
-  i = hash(key) % M
-  while keys[i] != null:
-    if keys[i] == key:
-      return vals[i]
-    i = (i + 1) % M
-  return null
+    def hash(self, key):
+        return key % self.M
 
-function delete(keys[], vals[], M, key):
-  // find the key
-  i = hash(key) % M
-  while keys[i] != null:
-    if keys[i] == key:
-      break
-    i = (i + 1) % M
-  if keys[i] == null:
-    return                    // key not found
-  // delete it
-  keys[i] = null
-  vals[i] = null
-  // rehash the rest of the cluster
-  j = (i + 1) % M
-  while keys[j] != null:
-    rehashKey = keys[j]
-    rehashVal = vals[j]
-    keys[j] = null
-    vals[j] = null
-    put(keys, vals, M, rehashKey, rehashVal)
-    j = (j + 1) % M`,
+    def get(self, key):
+        i = self.hash(self, key)
+        while (self.ht_keys[i]!=None):
+            if (self.ht_keys[i]==key)
+                return self.ht_values[i]
+            else i=(i+1)%self.M
+        return None
+
+    def put(key, value):
+        i = self.hash(self, key)
+        while (self.ht_keys[i]!=None):
+            if (self.ht_keys[i]==key)
+                self.ht_values[i] = value
+                return
+            else i=(i+1)%self.M
+        self.ht_keys[i] = key
+        self.ht_values[i] = value`,
       python: `def put(keys: list, vals: list, M: int, key, val):
     i = hash(key) % M
     while keys[i] is not None:

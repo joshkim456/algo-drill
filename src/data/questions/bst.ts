@@ -85,14 +85,26 @@ has expected height ~2 ln n ≈ 1.39 log2 n.`,
       "function insert(node, key):\n  if node == null: return new Node(key)\n  if key < node.key: node.left = insert(node.left, key)\n  else if key > node.key: node.right = insert(node.right, key)\n  return node",
     ],
     solutions: {
-      pseudocode: `function insert(node, key):
-  if node == null:
-    return new Node(key)
-  if key < node.key:
-    node.left = insert(node.left, key)
-  else if key > node.key:
-    node.right = insert(node.right, key)
-  return node`,
+      pseudocode: `class Node:
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+        self.left = None
+        self.right = None
+
+def put(self, key, value):
+    if key == self.key:
+        self.value = value
+    elif key < self.key:
+        if self.left is None:
+            self.left = Node(key, value)
+        else:
+            self.left.put(key, value)
+    elif key > self.key:
+        if self.right is None:
+            self.right = Node(key, value)
+        else:
+            self.right.put(key, value)`,
       python: `class Node:
     def __init__(self, key):
         self.key = key

@@ -19,13 +19,13 @@ export const llrbQuestions: (ImplementationQuestion | TableTraceQuestion | Canva
       "x = h.right\nh.right = x.left\nx.left = h\nx.color = h.color\nh.color = RED\nreturn x",
     ],
     solutions: {
-      pseudocode: `function rotateLeft(h):
-  x = h.right
-  h.right = x.left
-  x.left = h
-  x.color = h.color
-  h.color = RED
-  return x`,
+      pseudocode: `def rotateLeft(n):
+    x = n.right
+    n.right = x.left
+    x.left = n
+    x.color = n.color
+    n.color = RED
+    return x`,
       python: `def rotate_left(h):
     x = h.right
     h.right = x.left
@@ -55,13 +55,13 @@ export const llrbQuestions: (ImplementationQuestion | TableTraceQuestion | Canva
       "x = h.left\nh.left = x.right\nx.right = h\nx.color = h.color\nh.color = RED\nreturn x",
     ],
     solutions: {
-      pseudocode: `function rotateRight(h):
-  x = h.left
-  h.left = x.right
-  x.right = h
-  x.color = h.color
-  h.color = RED
-  return x`,
+      pseudocode: `def rotateRight(n):
+    x = n.left
+    n.left = x.right
+    x.right = n
+    x.color = n.color
+    n.color = RED
+    return x`,
       python: `def rotate_right(h):
     x = h.left
     h.left = x.right
@@ -91,10 +91,10 @@ export const llrbQuestions: (ImplementationQuestion | TableTraceQuestion | Canva
       "h.color = RED\nh.left.color = BLACK\nh.right.color = BLACK",
     ],
     solutions: {
-      pseudocode: `function flipColours(h):
-  h.color = RED
-  h.left.color = BLACK
-  h.right.color = BLACK`,
+      pseudocode: `def flipColor(n):
+    n.color = RED
+    n.left.color = BLACK
+    n.right.color = BLACK`,
       python: `def flip_colours(h):
     h.color = RED
     h.left.color = BLACK
@@ -121,30 +121,28 @@ export const llrbQuestions: (ImplementationQuestion | TableTraceQuestion | Canva
       "function put(h, key):\n  if h == null: return new Node(key, RED)\n  if key < h.key: h.left = put(h.left, key)\n  else if key > h.key: h.right = put(h.right, key)\n  // fix-ups\n  if isRed(h.right) and not isRed(h.left): h = rotateLeft(h)\n  if isRed(h.left) and isRed(h.left.left): h = rotateRight(h)\n  if isRed(h.left) and isRed(h.right): flipColours(h)\n  return h",
     ],
     solutions: {
-      pseudocode: `function put(h, key):
-  if h == null:
-    return new Node(key, RED)
-  if key < h.key:
-    h.left = put(h.left, key)
-  else if key > h.key:
-    h.right = put(h.right, key)
-  else:
-    h.value = value          // key already exists — update
+      pseudocode: `def put(n, key, value):
+    if (n == null) return Node(key, value, RED)
 
-  // fix-up: restore LLRB invariants on the way back up
-  if isRed(h.right) and not isRed(h.left):
-    h = rotateLeft(h)
-  if isRed(h.left) and isRed(h.left.left):
-    h = rotateRight(h)
-  if isRed(h.left) and isRed(h.right):
-    flipColours(h)
+    # traditional BST put operation to locate where to insert new node
+    if key < n.key:
+        n.left = put(n.left, key, value)
+    elif key > n.key:
+        n.right = put(n.right, key, value)
+    else:
+        n.value = value
 
-  return h
+    # fix-up: restore LLRB invariants on the way back up
+    if (isRed(n.right) && !isRed(n.left)):  n = rotateLeft(n)
+    if (isRed(n.left) && isRed(n.left.left)):  n = rotateRight(n)
+    if (isRed(n.left) && isRed(n.right)):  flipColors(n)
 
-// wrapper:
-function insert(key):
-  root = put(root, key)
-  root.color = BLACK`,
+    return n
+
+# wrapper:
+def insert(key, value):
+    root = put(root, key, value)
+    root.color = BLACK`,
       python: `RED = True
 BLACK = False
 

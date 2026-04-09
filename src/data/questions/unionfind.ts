@@ -15,22 +15,34 @@ export const unionFindQuestions: (ImplementationQuestion | TableTraceQuestion)[]
       "find: while parent[i] != i: i = parent[i]; return i\nunion: rootP = find(p), rootQ = find(q); if rootP == rootQ: return; if size[rootP] < size[rootQ]: parent[rootP] = rootQ; size[rootQ] += size[rootP]; else: parent[rootQ] = rootP; size[rootP] += size[rootQ]",
     ],
     solutions: {
-      pseudocode: `function find(parent[], i):
-  while parent[i] != i:
-    i = parent[i]
-  return i
+      pseudocode: `#init
+id = []
+size =[]
+for i in range (N):
+    id.append(i)
+    size.append(1)
 
-function union(parent[], size[], p, q):
-  rootP = find(parent, p)
-  rootQ = find(parent, q)
-  if rootP == rootQ:
-    return
-  if size[rootP] < size[rootQ]:
-    parent[rootP] = rootQ
-    size[rootQ] = size[rootQ] + size[rootP]
-  else:
-    parent[rootQ] = rootP
-    size[rootP] = size[rootP] + size[rootQ]`,
+#root
+def root(i):
+    while i!=id[i]:
+        i=id[i]
+    return i
+
+#find
+def find(u,v):
+    return root(u)==root(v)
+
+#union
+def union(u,v):
+    r_u=root(u)
+    r_v=root(v)
+    if r_u==r_v return
+    if size[r_u]<size[r_v]:
+        id[r_u]=r_v
+        size[r_v]+=size[r_u]
+    else
+        id[r_v]=r_u
+        size[r_u]+=size[r_v]`,
       python: `def find(parent: list[int], i: int) -> int:
     while parent[i] != i:
         i = parent[i]
@@ -69,22 +81,22 @@ def union(parent: list[int], size: list[int], p: int, q: int) -> None:
       "union(p, q) must scan the entire id[] array and change every entry equal to id[p] to id[q] (or vice versa). That's O(N) per union call.",
     ],
     solutions: {
-      pseudocode: `Quick-find maintains an id[] array where id[i] is the component identifier for element i.
+      pseudocode: `#init
+id = []
+for i in range (N):
+    id.append(i)
 
-find(i): return id[i]  →  O(1), just an array access.
+#union
+def union(u,v):
+    uid=id[u]
+    vid=id[v]
+    for i in range(N):
+        if id[i]==uid:
+            id[i]=vid
 
-union(p, q):
-  - Let pid = id[p], qid = id[q].
-  - Scan the entire id[] array: for every index i where id[i] == pid, set id[i] = qid.
-  - This is O(N) because it touches every element.
-
-connected(p, q): return id[p] == id[q]  →  O(1).
-
-Example: id = [0, 1, 2, 3, 4]
-  union(3, 4): scan array, change all 3s to 4 → id = [0, 1, 2, 4, 4]
-  union(0, 3): scan array, change all 0s to 4 → id = [4, 1, 2, 4, 4]
-
-Why impractical: N union operations on N objects costs O(N²) total. For 10⁹ objects, this is far too slow. Quick-find has fast find but unacceptably slow union.`,
+#find
+def find(u,v):
+    return id[u]==id[v]`,
       python: `Quick-find maintains an id[] array where id[i] is the component identifier for element i.
 
 find(i): return id[i]  →  O(1), just an array access.
@@ -123,31 +135,26 @@ Why impractical: N union operations on N objects costs O(N²) total. For 10⁹ o
       "The worst case happens when unions always create a tall, skinny tree (like a linked list). e.g., union(0,1), union(1,2), union(2,3),... creates a chain of depth N.",
     ],
     solutions: {
-      pseudocode: `Quick-union uses a parent[] array representing a forest of trees. parent[i] is the parent of i; roots satisfy parent[r] == r.
+      pseudocode: `#init
+id = []
+for i in range (N):
+    id.append(i)
 
-find(i): chase parent pointers until parent[i] == i → return i.
-  while parent[i] != i: i = parent[i]
-  This is O(tree height).
+#root
+def root(i):
+    while i!=id[i]:
+        i=id[i]
+    return i
 
-union(p, q):
-  rootP = find(p)
-  rootQ = find(q)
-  parent[rootP] = rootQ   ← just one link change, O(1) after find
-  Total: O(tree height) due to the two find calls.
+#find
+def find(u,v):
+    return root(u)==root(v)
 
-connected(p, q): return find(p) == find(q).
-
-Why it degrades:
-  There is no guarantee that trees stay balanced. If you union in a bad order, trees can become tall and skinny — essentially linked lists.
-
-  Example (worst case): starting from parent = [0, 1, 2, 3, 4]
-    union(0, 1): parent = [1, 1, 2, 3, 4]    tree: 0→1
-    union(1, 2): parent = [1, 2, 2, 3, 4]    tree: 0→1→2
-    union(2, 3): parent = [1, 2, 3, 3, 4]    tree: 0→1→2→3
-    union(3, 4): parent = [1, 2, 3, 4, 4]    tree: 0→1→2→3→4
-
-  Now find(0) must follow 4 pointers — O(N). N find operations costs O(N²).
-  This is what motivates weighted quick-union: always attach the smaller tree under the larger one.`,
+#union
+def union(u,v):
+    r_u=root(u)
+    r_v=root(v)
+    id[r_u]=r_v`,
       python: `Quick-union uses a parent[] array representing a forest of trees. parent[i] is the parent of i; roots satisfy parent[r] == r.
 
 find(i): chase parent pointers until parent[i] == i → return i.
