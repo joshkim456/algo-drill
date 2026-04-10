@@ -34,9 +34,9 @@ export default function GradeButtons({ question, onGotIt, onMissed }: GradeButto
       <div className="flex gap-3">
         <button
           onClick={onGotIt}
-          className="flex-1 py-3 rounded-lg bg-green-600 hover:bg-green-500 text-white font-medium transition-colors"
+          className="flex-1 py-3 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-medium transition-colors"
         >
-          Got it <span className="text-green-200 text-sm ml-1">(→ or 1)</span>
+          Override: Mark Correct <span className="text-amber-200 text-sm ml-1">(→ or 1)</span>
         </button>
         <button
           onClick={onMissed}
