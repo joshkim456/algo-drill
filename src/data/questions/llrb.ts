@@ -26,13 +26,6 @@ export const llrbQuestions: (ImplementationQuestion | TableTraceQuestion | Canva
     x.color = n.color
     n.color = RED
     return x`,
-      python: `def rotate_left(h):
-    x = h.right
-    h.right = x.left
-    x.left = h
-    x.color = h.color
-    h.color = RED
-    return x`,
     },
     complexity: {
       question: "What is the time complexity of rotateLeft?",
@@ -62,13 +55,6 @@ export const llrbQuestions: (ImplementationQuestion | TableTraceQuestion | Canva
     x.color = n.color
     n.color = RED
     return x`,
-      python: `def rotate_right(h):
-    x = h.left
-    h.left = x.right
-    x.right = h
-    x.color = h.color
-    h.color = RED
-    return x`,
     },
     complexity: {
       question: "What is the time complexity of rotateRight?",
@@ -95,10 +81,6 @@ export const llrbQuestions: (ImplementationQuestion | TableTraceQuestion | Canva
     n.color = RED
     n.left.color = BLACK
     n.right.color = BLACK`,
-      python: `def flip_colours(h):
-    h.color = RED
-    h.left.color = BLACK
-    h.right.color = BLACK`,
     },
     complexity: {
       question: "What is the time complexity of flipColours?",
@@ -142,65 +124,6 @@ export const llrbQuestions: (ImplementationQuestion | TableTraceQuestion | Canva
 # wrapper:
 def insert(key, value):
     root = put(root, key, value)
-    root.color = BLACK`,
-      python: `RED = True
-BLACK = False
-
-class Node:
-    def __init__(self, key, color=RED):
-        self.key = key
-        self.color = color      # colour of link from parent to this node
-        self.left = None
-        self.right = None
-
-def is_red(node):
-    if node is None:
-        return False
-    return node.color == RED
-
-def rotate_left(h):
-    x = h.right
-    h.right = x.left
-    x.left = h
-    x.color = h.color
-    h.color = RED
-    return x
-
-def rotate_right(h):
-    x = h.left
-    h.left = x.right
-    x.right = h
-    x.color = h.color
-    h.color = RED
-    return x
-
-def flip_colours(h):
-    h.color = RED
-    h.left.color = BLACK
-    h.right.color = BLACK
-
-def put(h, key):
-    if h is None:
-        return Node(key, RED)
-    if key < h.key:
-        h.left = put(h.left, key)
-    elif key > h.key:
-        h.right = put(h.right, key)
-
-    # fix-up: restore LLRB invariants
-    if is_red(h.right) and not is_red(h.left):
-        h = rotate_left(h)
-    if is_red(h.left) and is_red(h.left.left):
-        h = rotate_right(h)
-    if is_red(h.left) and is_red(h.right):
-        flip_colours(h)
-
-    return h
-
-# wrapper
-def insert(key):
-    global root
-    root = put(root, key)
     root.color = BLACK`,
     },
     complexity: {

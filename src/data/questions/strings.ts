@@ -51,45 +51,6 @@ class RWayTrie:
 
   function contains(key):
     return get(key) != null`,
-      python: `class TrieNode:
-    def __init__(self, R: int = 256):
-        self.val = None
-        self.children: list[TrieNode | None] = [None] * R
-
-class RWayTrie:
-    def __init__(self, R: int = 256):
-        self.root: TrieNode | None = None
-        self.R = R
-
-    def get(self, key: str):
-        node = self._get(self.root, key, 0)
-        if node is None:
-            return None
-        return node.val
-
-    def _get(self, node: TrieNode | None, key: str, d: int) -> TrieNode | None:
-        if node is None:
-            return None
-        if d == len(key):
-            return node
-        c = ord(key[d])
-        return self._get(node.children[c], key, d + 1)
-
-    def put(self, key: str, val) -> None:
-        self.root = self._put(self.root, key, val, 0)
-
-    def _put(self, node: TrieNode | None, key: str, val, d: int) -> TrieNode:
-        if node is None:
-            node = TrieNode(self.R)
-        if d == len(key):
-            node.val = val
-            return node
-        c = ord(key[d])
-        node.children[c] = self._put(node.children[c], key, val, d + 1)
-        return node
-
-    def contains(self, key: str) -> bool:
-        return self.get(key) is not None`,
     },
     complexity: {
       question: "What is the time complexity of get/put in an R-way trie? What is the space complexity?",
@@ -98,21 +59,21 @@ class RWayTrie:
     source: "Syllabus; supports 21-22 Q4b auto-complete",
   },
 
-  // ── 2. Trie keysWithPrefix ──
+  // ── 2. Trie: all keys with a given prefix ──
   {
     id: "strings-trie-prefix-small",
     type: "implement",
     topic: "strings",
     tier: "small",
-    title: "Trie keysWithPrefix",
-    prompt: "Given an R-way trie, implement keysWithPrefix(prefix) which returns all keys in the trie that start with the given prefix string. Assume the trie already supports get and put.",
+    title: "Trie: collect all keys with prefix",
+    prompt: "Given an R-way trie, implement an operation that returns all keys in the trie that start with a given prefix string. Assume the trie already supports get and put.",
     hints: [
-      "Function signature: keysWithPrefix(prefix) -> list of keys. First, navigate to the subtrie rooted at the last character of the prefix using _get.",
+      "Function signature: prefixMatch(prefix) -> list of keys. First, navigate to the subtrie rooted at the last character of the prefix using _get.",
       "Once you have the subtrie root node, do a DFS/collect over that subtrie, building up the prefix as you go. When you reach a node with a non-null value, add the accumulated prefix to the results.",
-      "function keysWithPrefix(prefix):\n  results = []\n  node = _get(root, prefix, 0)\n  collect(node, prefix, results)\n  return results\n\nfunction collect(node, prefix, results):\n  if node == null: return\n  if node.val != null: results.add(prefix)\n  for c = 0 to R-1:\n    collect(node.children[c], prefix + char(c), results)",
+      "function prefixMatch(prefix):\n  results = []\n  node = _get(root, prefix, 0)\n  collect(node, prefix, results)\n  return results\n\nfunction collect(node, prefix, results):\n  if node == null: return\n  if node.val != null: results.add(prefix)\n  for c = 0 to R-1:\n    collect(node.children[c], prefix + char(c), results)",
     ],
     solutions: {
-      pseudocode: `function keysWithPrefix(prefix):
+      pseudocode: `function prefixMatch(prefix):
   results = []
   node = _get(root, prefix, 0)
   collect(node, prefix, results)
@@ -125,25 +86,9 @@ function collect(node, prefix, results):
   for c = 0 to R-1:
     if node.children[c] != null:
       collect(node.children[c], prefix + char(c), results)`,
-      python: `def keys_with_prefix(self, prefix: str) -> list[str]:
-    results: list[str] = []
-    node = self._get(self.root, prefix, 0)
-    self._collect(node, list(prefix), results)
-    return results
-
-def _collect(self, node: TrieNode | None, prefix: list[str], results: list[str]) -> None:
-    if node is None:
-        return
-    if node.val is not None:
-        results.append("".join(prefix))
-    for c in range(self.R):
-        if node.children[c] is not None:
-            prefix.append(chr(c))
-            self._collect(node.children[c], prefix, results)
-            prefix.pop()`,
     },
     complexity: {
-      question: "What is the time complexity of keysWithPrefix?",
+      question: "What is the time complexity of collecting all keys with a given prefix?",
       answer: "O(L + S) where L is the prefix length (to navigate to the subtrie) and S is the total number of characters in all matching keys (to traverse the subtrie and collect results).",
     },
     source: "Core of auto-complete (21-22 Q4b, 20 marks)",
@@ -205,53 +150,6 @@ class TST:
     else:
       node.val = val
     return node`,
-      python: `class TSTNode:
-    def __init__(self, c: str):
-        self.c = c
-        self.val = None
-        self.left: TSTNode | None = None
-        self.mid: TSTNode | None = None
-        self.right: TSTNode | None = None
-
-class TST:
-    def __init__(self):
-        self.root: TSTNode | None = None
-
-    def get(self, key: str):
-        node = self._get(self.root, key, 0)
-        if node is None:
-            return None
-        return node.val
-
-    def _get(self, node: TSTNode | None, key: str, d: int) -> TSTNode | None:
-        if node is None:
-            return None
-        c = key[d]
-        if c < node.c:
-            return self._get(node.left, key, d)
-        elif c > node.c:
-            return self._get(node.right, key, d)
-        elif d < len(key) - 1:
-            return self._get(node.mid, key, d + 1)
-        else:
-            return node
-
-    def put(self, key: str, val) -> None:
-        self.root = self._put(self.root, key, val, 0)
-
-    def _put(self, node: TSTNode | None, key: str, val, d: int) -> TSTNode:
-        c = key[d]
-        if node is None:
-            node = TSTNode(c)
-        if c < node.c:
-            node.left = self._put(node.left, key, val, d)
-        elif c > node.c:
-            node.right = self._put(node.right, key, val, d)
-        elif d < len(key) - 1:
-            node.mid = self._put(node.mid, key, val, d + 1)
-        else:
-            node.val = val
-        return node`,
     },
     complexity: {
       question: "What is the time complexity of TST get/put? How does space compare to an R-way trie?",
@@ -284,21 +182,10 @@ class TST:
       dfa[c][j] = dfa[c][X]       // mismatch transitions
     dfa[pattern[j]][j] = j + 1     // match transition
     X = dfa[pattern[j]][X]         // update restart state`,
-      python: `def build_dfa(pattern: str, R: int = 256) -> list[list[int]]:
-    M = len(pattern)
-    dfa = [[0] * M for _ in range(R)]
-    dfa[ord(pattern[0])][0] = 1
-    X = 0
-    for j in range(1, M):
-        for c in range(R):
-            dfa[c][j] = dfa[c][X]         # mismatch
-        dfa[ord(pattern[j])][j] = j + 1   # match
-        X = dfa[ord(pattern[j])][X]       # update restart
-    return dfa`,
     },
     complexity: {
       question: "What is the time complexity of KMP DFA construction and KMP search?",
-      answer: "DFA construction: O(R*M) where R is alphabet size, M is pattern length. Search: O(N) where N is text length — guaranteed linear, no backup in the text.",
+      answer: "DFA construction: O(R*M) where R is alphabet size, M is pattern length. Search: O(M+N) where M is pattern length and N is text length — guaranteed linear, no backup in the text.",
     },
     source: "21-22 Q4a (10 marks), 21-22 Practice Q4b",
   },
@@ -339,27 +226,6 @@ function search(text, pattern):
       return i               // match found
     i = i + skip
   return -1                   // no match`,
-      python: `def build_right(pattern: str, R: int = 256) -> list[int]:
-    right = [-1] * R
-    for j, c in enumerate(pattern):
-        right[ord(c)] = j
-    return right
-
-def search(text: str, pattern: str) -> int:
-    N = len(text)
-    M = len(pattern)
-    right = build_right(pattern)
-    i = 0
-    while i <= N - M:
-        skip = 0
-        for j in range(M - 1, -1, -1):
-            if pattern[j] != text[i + j]:
-                skip = max(1, j - right[ord(text[i + j])])
-                break
-        if skip == 0:
-            return i          # match found
-        i += skip
-    return -1                 # no match`,
     },
     complexity: {
       question: "What is the time complexity of Boyer-Moore with the bad-character heuristic?",
@@ -368,17 +234,17 @@ def search(text: str, pattern: str) -> int:
     source: "21-22 LSA Q4b (16 marks)",
   },
 
-  // ── 6. LSD Radix Sort with Key-Indexed Counting ──
+  // ── 6. LSD Radix Sort with Counting Sort ──
   {
     id: "strings-lsd-full",
     type: "implement",
     topic: "strings",
     tier: "full",
-    title: "LSD Radix Sort with Key-Indexed Counting",
-    prompt: "Implement LSD (Least-Significant-Digit first) radix sort for fixed-length strings. Use key-indexed counting as the stable sort for each character position. Process characters from right (position W-1) to left (position 0).",
+    title: "LSD Radix Sort with Counting Sort",
+    prompt: "Implement LSD (Least-Significant-Digit first) radix sort for fixed-length strings. Use counting sort as the stable sort for each character position. Process characters from right (position W-1) to left (position 0).",
     hints: [
-      "Function signature: lsdSort(a[], W) where all strings have length W. Process from d = W-1 down to 0. At each position, use key-indexed counting with R = 256.",
-      "Key-indexed counting has 4 steps: (1) count frequencies, (2) compute cumulates, (3) distribute (move data), (4) copy back. Use count[] of size R+1.",
+      "Function signature: lsdSort(a[], W) where all strings have length W. Process from d = W-1 down to 0. At each position, use counting sort with R = 256.",
+      "Counting sort has 4 steps: (1) count frequencies, (2) compute cumulates, (3) distribute (move data), (4) copy back. Use count[] of size R+1.",
       "for d = W-1 downto 0:\n  count = new int[R+1]\n  for i: count[a[i][d] + 1]++           // frequency\n  for r = 0 to R-1: count[r+1] += count[r]  // cumulates\n  for i: aux[count[a[i][d]]++] = a[i]   // distribute\n  for i: a[i] = aux[i]                  // copy back",
     ],
     solutions: {
@@ -401,29 +267,10 @@ def search(text: str, pattern: str) -> int:
     // 4. Copy back
     for i = 0 to N - 1:
       a[i] = aux[i]`,
-      python: `def lsd_sort(a: list[str], W: int) -> None:
-    N = len(a)
-    R = 256
-    aux = [""] * N
-    for d in range(W - 1, -1, -1):
-        count = [0] * (R + 1)
-        # 1. Count frequencies
-        for i in range(N):
-            count[ord(a[i][d]) + 1] += 1
-        # 2. Compute cumulates
-        for r in range(R):
-            count[r + 1] += count[r]
-        # 3. Distribute
-        for i in range(N):
-            aux[count[ord(a[i][d])]] = a[i]
-            count[ord(a[i][d])] += 1
-        # 4. Copy back
-        for i in range(N):
-            a[i] = aux[i]`,
     },
     complexity: {
       question: "What is the time complexity of LSD radix sort?",
-      answer: "O(W * (N + R)) where W is string length, N is number of strings, R is alphabet size. Each of the W passes does key-indexed counting in O(N + R). LSD is linear when W is constant and R is bounded.",
+      answer: "O(W * (N + R)) where W is string length, N is number of strings, R is alphabet size. Each of the W passes does a counting sort in O(N + R). LSD is linear when W is constant and R is bounded.",
     },
     source: "21-22 LSA Q4a (9 marks)",
   },
@@ -439,35 +286,19 @@ def search(text: str, pattern: str) -> int:
     hints: [
       "Create a leaf node for each character with its frequency. Insert all into a min-PQ.",
       "Repeat until one node remains: extract two smallest, create a parent with freq = sum of children, insert parent back.",
-      "while pq.size() > 1:\n  left = pq.delMin()\n  right = pq.delMin()\n  parent = new Node(freq=left.freq+right.freq, left=left, right=right)\n  pq.insert(parent)",
+      "while pq.size() > 1:\n  left = pq.extractMin()\n  right = pq.extractMin()\n  parent = new Node(freq=left.freq+right.freq, left=left, right=right)\n  pq.insert(parent)",
     ],
     solutions: {
       pseudocode: `function buildHuffmanTree(chars[], freqs[]):
-  pq = new MinPQ()
+  pq = new MinPriorityQueue()
   for i = 0 to length(chars)-1:
     pq.insert(new Node(chars[i], freqs[i], null, null))
   while pq.size() > 1:
-    left = pq.delMin()
-    right = pq.delMin()
+    left = pq.extractMin()
+    right = pq.extractMin()
     parent = new Node(null, left.freq + right.freq, left, right)
     pq.insert(parent)
-  return pq.delMin()`,
-      python: `import heapq
-
-def build_huffman_tree(chars: list[str], freqs: list[int]):
-    # Use (freq, id, node) tuples for heap ordering
-    heap = []
-    for i, (ch, f) in enumerate(zip(chars, freqs)):
-        node = {"char": ch, "freq": f, "left": None, "right": None}
-        heapq.heappush(heap, (f, i, node))
-    counter = len(chars)
-    while len(heap) > 1:
-        f1, _, left = heapq.heappop(heap)
-        f2, _, right = heapq.heappop(heap)
-        parent = {"char": None, "freq": f1 + f2, "left": left, "right": right}
-        heapq.heappush(heap, (f1 + f2, counter, parent))
-        counter += 1
-    return heap[0][2]`,
+  return pq.extractMin()`,
     },
     complexity: {
       question: "What is the time complexity of Huffman tree construction?",
@@ -510,27 +341,6 @@ function isPrefixFree(codewords[]):
       return false          // current word is prefix of existing
     node.isTerminal = true
   return true`,
-      python: `class TrieNode:
-    def __init__(self):
-        self.is_terminal = False
-        self.children: list[TrieNode | None] = [None, None]
-
-def is_prefix_free(codewords: list[str]) -> bool:
-    root = TrieNode()
-    for word in codewords:
-        node = root
-        for ch in word:
-            bit = int(ch)      # 0 or 1
-            if node.is_terminal:
-                return False   # existing word is prefix of current
-            if node.children[bit] is None:
-                node.children[bit] = TrieNode()
-            node = node.children[bit]
-        # finished inserting current word
-        if node.children[0] is not None or node.children[1] is not None:
-            return False       # current word is prefix of existing
-        node.is_terminal = True
-    return True`,
     },
     complexity: {
       question: "What is the time and space complexity of the prefix-free verification?",
@@ -548,7 +358,7 @@ def is_prefix_free(codewords: list[str]) -> bool:
     title: "Auto-Complete Engine Design",
     prompt: "Design an auto-complete system. Given a dictionary of words with associated weights (popularity scores), implement: (1) insert(word, weight), (2) autocomplete(prefix, k) that returns the top-k words matching the prefix, ordered by weight descending. Describe your data structure, algorithms, and complexity.",
     hints: [
-      "Use a trie to store words. Each leaf stores the word's weight. autocomplete = keysWithPrefix + sorting by weight.",
+      "Use a trie to store words. Each leaf stores the word's weight. autocomplete = collect all keys with prefix + sort by weight.",
       "Optimisation: store the maximum weight in each node's subtrie, so you can prune branches that can't beat the current top-k. But the basic approach (collect all matches, sort by weight, take top k) is the expected exam answer.",
       "insert: standard trie put with weight as value.\nautocomplete(prefix, k):\n  node = _get(root, prefix, 0)\n  if node == null: return []\n  results = []\n  collect(node, prefix, results)  // collect all (word, weight) pairs\n  sort results by weight descending\n  return results[0..k-1]",
     ],
@@ -589,56 +399,6 @@ def is_prefix_free(codewords: list[str]) -> bool:
     if d == length(key): return node
     c = charAt(key, d)
     return _get(node.children[c], key, d + 1)`,
-      python: `class TrieNode:
-    def __init__(self, R: int = 256):
-        self.val: int | None = None   # weight
-        self.children: list[TrieNode | None] = [None] * R
-
-class AutoComplete:
-    def __init__(self, R: int = 256):
-        self.root: TrieNode | None = None
-        self.R = R
-
-    def insert(self, word: str, weight: int) -> None:
-        self.root = self._put(self.root, word, weight, 0)
-
-    def _put(self, node: TrieNode | None, word: str, weight: int, d: int) -> TrieNode:
-        if node is None:
-            node = TrieNode(self.R)
-        if d == len(word):
-            node.val = weight
-            return node
-        c = ord(word[d])
-        node.children[c] = self._put(node.children[c], word, weight, d + 1)
-        return node
-
-    def _get(self, node: TrieNode | None, key: str, d: int) -> TrieNode | None:
-        if node is None:
-            return None
-        if d == len(key):
-            return node
-        return self._get(node.children[ord(key[d])], key, d + 1)
-
-    def autocomplete(self, prefix: str, k: int) -> list[tuple[str, int]]:
-        node = self._get(self.root, prefix, 0)
-        if node is None:
-            return []
-        results: list[tuple[str, int]] = []
-        self._collect(node, list(prefix), results)
-        results.sort(key=lambda x: x[1], reverse=True)
-        return results[:k]
-
-    def _collect(self, node: TrieNode | None, prefix: list[str],
-                 results: list[tuple[str, int]]) -> None:
-        if node is None:
-            return
-        if node.val is not None:
-            results.append(("".join(prefix), node.val))
-        for c in range(self.R):
-            if node.children[c] is not None:
-                prefix.append(chr(c))
-                self._collect(node.children[c], prefix, results)
-                prefix.pop()`,
     },
     complexity: {
       question: "What is the complexity of autocomplete(prefix, k)?",
@@ -661,13 +421,13 @@ class AutoComplete:
     prompt: "Explain MSD (Most-Significant-Digit first) radix sort. How does it differ from LSD? What is the recursive idea? When does it degenerate in performance, and how is this addressed?",
     hints: [
       "MSD processes characters left-to-right (most significant first), unlike LSD which goes right-to-left.",
-      "MSD partitions strings by their first character using key-indexed counting, then recursively sorts each partition on the next character.",
-      "Think about what happens when many strings share a long common prefix — how many empty subarrays does key-indexed counting create?",
+      "MSD partitions strings by their first character using counting sort, then recursively sorts each partition on the next character.",
+      "Think about what happens when many strings share a long common prefix — how many empty subarrays does counting sort create?",
     ],
     solutions: {
       pseudocode: `MSD radix sort works left-to-right, recursively:
 
-1. PARTITION by the d-th character using key-indexed counting (same 4 steps as LSD).
+1. PARTITION by the d-th character using counting sort (same 4 steps as LSD).
 2. RECURSE on each of the R resulting subarrays for character position d+1.
 3. BASE CASE: subarray of size 0 or 1, or all characters exhausted.
 
@@ -678,32 +438,10 @@ Key differences from LSD:
 
 Performance issue:
 - Creates R subarrays at each level, even if most are empty.
-- For small subarrays, the overhead of key-indexed counting (initialising count[R+1]) dominates.
+- For small subarrays, the overhead of counting sort (initialising count[R+1]) dominates.
 - Fix: switch to insertion sort for small subarrays (cutoff ~15).
 
 Handles variable-length strings by treating end-of-string as a character smaller than any real character (index -1 + 1 = 0 in count[]).`,
-      python: `MSD radix sort works left-to-right, recursively:
-
-1. PARTITION by the d-th character using key-indexed counting (same 4 steps as LSD).
-2. RECURSE on each of the R resulting subarrays for character position d+1.
-3. BASE CASE: subarray of size 0 or 1, or all characters exhausted.
-
-Key differences from LSD:
-- LSD: right-to-left, requires fixed-length keys, always does exactly W passes.
-- MSD: left-to-right, handles variable-length keys, can stop early when subarrays are small.
-- LSD is non-recursive (W flat passes). MSD is recursive (divide by first char, recurse).
-
-Performance issue:
-- Creates R subarrays at each level, even if most are empty.
-- For small subarrays, the overhead of key-indexed counting (initialising count[R+1]) dominates.
-- Fix: switch to insertion sort for small subarrays (cutoff ~15).
-
-Handles variable-length strings by treating end-of-string as a character
-smaller than any real character (index -1 + 1 = 0 in count[]).
-
-Complexity: O(N * W) worst case (same as LSD), but can be sublinear
-in practice when keys diverge early. Space: O(N + W*R) for aux array
-and recursion stack count arrays.`,
     },
     complexity: {
       question: "",
@@ -745,7 +483,7 @@ ALGORITHM:
     sort(a, gt + 1, hi, d)        // recurse on > group, same char
 
 WHY IT BEATS MSD:
-- MSD creates R subarrays per level via key-indexed counting. When R is large (256) and most buckets are empty, this wastes time initialising count[].
+- MSD creates R subarrays per level via counting sort. When R is large (256) and most buckets are empty, this wastes time initialising count[].
 - 3-way partitioning adapts to the data: it only creates 3 groups, avoiding the R-bucket overhead.
 - Especially effective when strings have long common prefixes (the == group advances to the next character without any wasted partitioning).
 - Does not need an auxiliary array (in-place via swaps).
@@ -753,33 +491,6 @@ WHY IT BEATS MSD:
 COMPLEXITY:
 - O(N * W) worst case, but typically O(N * ln N) for random strings.
 - Uses O(W) extra space (recursion stack) vs O(N + W*R) for MSD.`,
-      python: `3-way radix quicksort combines quicksort's 3-way partitioning with MSD's character-by-character processing:
-
-ALGORITHM:
-  sort(a, lo, hi, d):
-    if lo >= hi: return
-    v = charAt(a[lo], d)          # pivot character
-    lt, gt, i = lo, hi, lo + 1
-    while i <= gt:
-      c = charAt(a[i], d)
-      if c < v:    swap a[lt] and a[i]; lt += 1; i += 1
-      elif c > v:  swap a[i] and a[gt]; gt -= 1
-      else:        i += 1
-    # Now: a[lo..lt-1] < v, a[lt..gt] == v, a[gt+1..hi] > v
-    sort(a, lo, lt - 1, d)        # < group, same character position
-    if v >= 0:                     # not end-of-string
-      sort(a, lt, gt, d + 1)      # == group, advance to next char
-    sort(a, gt + 1, hi, d)        # > group, same character position
-
-WHY IT BEATS MSD:
-- MSD creates R subarrays per level. When R is large (256) and most buckets are empty, this wastes time.
-- 3-way partitioning creates only 3 groups, adapting to the data naturally.
-- Very effective with long common prefixes: the == group advances without wasted partitioning.
-- In-place (no auxiliary array needed).
-
-COMPLEXITY:
-- O(N * W) worst case, but typically O(N * ln N) for random strings.
-- O(W) extra space (recursion stack) vs O(N + W*R) for MSD.`,
     },
     complexity: {
       question: "",
@@ -831,35 +542,6 @@ WHEN TO PREFER:
   - Multi-pattern search: can check multiple pattern hashes simultaneously.
   - 2D pattern matching.
   - When you need a simple implementation and expected-case is acceptable.`,
-      python: `Rabin-Karp uses a rolling hash to search for a pattern in text:
-
-IDEA:
-  1. Compute hash of pattern: hash_pat = hash(pattern[0..M-1])
-  2. Compute hash of first M characters of text: hash_txt = hash(text[0..M-1])
-  3. Slide window. At each position i:
-     - If hash_txt == hash_pat: verify char-by-char (Las Vegas) or accept (Monte Carlo)
-     - Update hash_txt in O(1) using the rolling hash formula
-
-ROLLING HASH (Horner's method mod a large prime Q):
-  hash(s[0..M-1]) = (s[0] * R^(M-1) + s[1] * R^(M-2) + ... + s[M-1]) mod Q
-
-  Slide from position i to i+1:
-  hash_txt = ((hash_txt - text[i] * R^(M-1)) * R + text[i + M]) % Q
-
-  Precompute R^(M-1) % Q to avoid recomputing each time.
-
-MONTE CARLO vs LAS VEGAS:
-  - Monte Carlo: accept on hash match without verification. Probability of error ~ 1/Q.
-  - Las Vegas: verify char-by-char on hash match. Always correct. Worst case O(N*M).
-
-COMPLEXITY:
-  - Expected: O(N + M) for both variants.
-  - Worst case: O(N*M) for Las Vegas; O(N + M) for Monte Carlo (but can give wrong answer).
-
-WHEN TO PREFER OVER KMP/BOYER-MOORE:
-  - Multi-pattern search (check several pattern hashes at once).
-  - 2D pattern matching (extend rolling hash to 2D).
-  - Simple to implement when expected-case performance suffices.`,
     },
     complexity: {
       question: "",
@@ -868,21 +550,21 @@ WHEN TO PREFER OVER KMP/BOYER-MOORE:
     source: "Syllabus; never examined (0/6), Section B curveball",
   },
 
-  // ── 13. Key-Indexed Counting (conceptual) ──
+  // ── 13. Counting Sort (conceptual) ──
   {
     id: "strings-key-indexed-counting-conceptual",
     type: "implement",
     topic: "strings",
     tier: "conceptual",
-    title: "Key-Indexed Counting",
-    prompt: "Explain key-indexed counting, the stable sorting subroutine used within LSD and MSD radix sort. What are the four steps? Why is the +1 offset in the count array needed? Why must the sort be stable?",
+    title: "Counting Sort",
+    prompt: "Explain counting sort, the stable sorting subroutine used within LSD and MSD radix sort. What are the four steps? Why is the +1 offset in the count array needed? Why must the sort be stable?",
     hints: [
-      "Key-indexed counting sorts N items whose keys are integers in the range [0, R-1]. It uses a count[] array of size R+1.",
+      "Counting sort sorts N items whose keys are integers in the range [0, R-1]. It uses a count[] array of size R+1.",
       "The four steps are: (1) count frequencies, (2) compute cumulates, (3) distribute items to aux[], (4) copy back.",
       "Think about why stability matters: in LSD, each pass must preserve the order established by previous passes on less-significant characters.",
     ],
     solutions: {
-      pseudocode: `Key-indexed counting sorts N items with integer keys in range [0, R-1] in O(N + R) time.
+      pseudocode: `Counting sort sorts N items with integer keys in range [0, R-1] in O(N + R) time.
 
 THE FOUR STEPS:
 
@@ -923,45 +605,6 @@ WHY STABILITY IS ESSENTIAL:
 - Stability is what makes LSD work: by the time we sort on the most
   significant character, ties are broken correctly by all less-significant
   characters (already sorted in previous stable passes).`,
-      python: `Key-indexed counting sorts N items with integer keys in range [0, R-1] in O(N + R) time.
-
-THE FOUR STEPS:
-
-1. COUNT FREQUENCIES
-   count = [0] * (R + 1)
-   for item in a:
-     count[key(item) + 1] += 1
-   # The +1 offset: count[r+1] stores the frequency of key r.
-
-2. COMPUTE CUMULATES
-   for r in range(R):
-     count[r+1] += count[r]
-   # After this, count[r] = number of items with key < r.
-   # This gives the starting index in aux[] for key r.
-
-3. DISTRIBUTE
-   for item in a:
-     aux[count[key(item)]] = item
-     count[key(item)] += 1
-   # Post-increment preserves insertion order = stability.
-
-4. COPY BACK
-   for i in range(N):
-     a[i] = aux[i]
-
-WHY THE +1 OFFSET?
-- Storing freq of key r in count[r+1] means the cumulate step
-  naturally converts to starting indices. count[0] = 0 (start of key 0),
-  count[1] = freq of key 0 (start of key 1), etc.
-
-WHY STABILITY IS ESSENTIAL:
-- In LSD, we sort by least significant character first. Each subsequent
-  pass must preserve relative order from previous passes.
-- Without stability, earlier passes would be scrambled. Stability is what
-  makes LSD correct: by the final pass, ties at each character position
-  are broken by all less-significant characters already in order.
-
-COMPLEXITY: O(N + R) time, O(N + R) space. Linear when R is bounded.`,
     },
     complexity: {
       question: "",

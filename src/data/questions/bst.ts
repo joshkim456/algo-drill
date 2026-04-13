@@ -41,28 +41,6 @@ Why insertion order matters:
 
 Average case (random insertion order): O(log n) — a randomly built BST
 has expected height ~2 ln n ≈ 1.39 log2 n.`,
-      python: `BST search compares the target key against each node, going left or right.
-The number of comparisons equals the depth of the target node (+ 1 for the root).
-
-Best case: O(log n) — the tree is balanced.
-  Example insertion order: 7, 3, 11, 1, 5, 9, 13
-  This produces a balanced tree of height 2 (for 7 nodes).
-  Every search visits at most 3 nodes.
-
-Worst case: O(n) — the tree is a degenerate chain (linked list).
-  Example insertion order: 1, 2, 3, 4, 5, 6, 7
-  Every node has only a right child. Searching for 7 visits all 7 nodes.
-
-Why insertion order matters:
-  The first key inserted becomes the root. Subsequent keys are placed
-  by the BST insert rule (left if smaller, right if larger). A sorted
-  sequence always goes right, producing a right-skewed chain. A sequence
-  where the median is inserted first (then medians of sub-halves) produces
-  a balanced tree. The BST has no rebalancing — its shape is entirely
-  determined by insertion order.
-
-Average case (random insertion order): O(log n) — a randomly built BST
-has expected height ~2 ln n ≈ 1.39 log2 n.`,
     },
     complexity: {
       question: "",
@@ -105,20 +83,6 @@ def put(self, key, value):
             self.right = Node(key, value)
         else:
             self.right.put(key, value)`,
-      python: `class Node:
-    def __init__(self, key):
-        self.key = key
-        self.left = None
-        self.right = None
-
-def insert(node: Node | None, key: int) -> Node:
-    if node is None:
-        return Node(key)
-    if key < node.key:
-        node.left = insert(node.left, key)
-    elif key > node.key:
-        node.right = insert(node.right, key)
-    return node`,
     },
     complexity: {
       question: "What is the time complexity of BST insert in the best and worst case?",
@@ -168,38 +132,6 @@ function min(node):
   while node.left != null:
     node = node.left
   return node`,
-      python: `class Node:
-    def __init__(self, key):
-        self.key = key
-        self.left = None
-        self.right = None
-
-def minimum(node: Node) -> Node:
-    while node.left is not None:
-        node = node.left
-    return node
-
-def delete(node: Node | None, key: int) -> Node | None:
-    if node is None:
-        return None
-
-    if key < node.key:
-        node.left = delete(node.left, key)
-    elif key > node.key:
-        node.right = delete(node.right, key)
-    else:
-        # Found the node to delete
-        # Case 1 & 2: leaf or one child
-        if node.left is None:
-            return node.right
-        if node.right is None:
-            return node.left
-        # Case 3: two children — Hibbard deletion
-        successor = minimum(node.right)
-        node.key = successor.key
-        node.right = delete(node.right, successor.key)
-
-    return node`,
     },
     complexity: {
       question: "What is the time complexity of BST delete? Why can repeated deletions degrade performance?",
@@ -223,34 +155,6 @@ def delete(node: Node | None, key: int) -> Node | None:
     ],
     solutions: {
       pseudocode: `In-order traversal property:
-  An in-order traversal of a BST visits nodes in ascending key order.
-  Algorithm: inorder(node) = inorder(node.left), visit(node), inorder(node.right).
-  This works because the BST property guarantees:
-    - All keys in the left subtree < node.key
-    - All keys in the right subtree > node.key
-  So visiting left-self-right produces a sorted sequence.
-
-In-order successor:
-  The in-order successor of node X is the next node in the sorted order —
-  the node with the smallest key greater than X.key.
-  Location: it is the leftmost (minimum) node in X's right subtree.
-  To find it: go to X.right, then follow left pointers until left is null.
-
-Role in BST deletion (Hibbard deletion):
-  When deleting a node with two children, we cannot simply remove it —
-  both subtrees need a parent. We replace the deleted node's key with
-  its in-order successor's key, then delete the successor from the
-  right subtree (which is simpler — the successor has at most one child,
-  since it has no left child by definition of being the minimum).
-
-  Why the in-order successor works:
-    - It is greater than every key in the left subtree (BST property).
-    - It is less than every other key in the right subtree (it was the min).
-    - So placing it at the deleted node's position preserves the BST property.
-
-  Note: you could equally use the in-order predecessor (maximum of the
-  left subtree). The standard Hibbard deletion uses the successor.`,
-      python: `In-order traversal property:
   An in-order traversal of a BST visits nodes in ascending key order.
   Algorithm: inorder(node) = inorder(node.left), visit(node), inorder(node.right).
   This works because the BST property guarantees:

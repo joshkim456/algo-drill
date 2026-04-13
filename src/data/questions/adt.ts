@@ -38,27 +38,6 @@ export const adtQuestions: ImplementationQuestion[] = [
     for i = 0 to n-1:
       copy[i] = a[i]
     a = copy`,
-      python: `class ArrayStack:
-    def __init__(self):
-        self._a = [None]
-        self._n = 0
-
-    def push(self, item):
-        if self._n == len(self._a):
-            self._resize(2 * len(self._a))
-        self._a[self._n] = item
-        self._n += 1
-
-    def pop(self):
-        self._n -= 1
-        item = self._a[self._n]
-        self._a[self._n] = None
-        if self._n > 0 and self._n == len(self._a) // 4:
-            self._resize(len(self._a) // 2)
-        return item
-
-    def _resize(self, capacity):
-        self._a = self._a[:self._n] + [None] * (capacity - self._n)`,
     },
     complexity: {
       question: "What is the amortised time complexity of push and pop?",
@@ -89,33 +68,6 @@ pop ():
   targetNode = head
   head = head.next
   return targetNode`,
-      python: `class Node:
-    def __init__(self, item):
-        self.item = item
-        self.next = None
-
-class LinkedStack:
-    def __init__(self):
-        self._head = None
-        self._n = 0
-
-    def push(self, item):
-        old_head = self._head
-        self._head = Node(item)
-        self._head.next = old_head
-        self._n += 1
-
-    def pop(self):
-        item = self._head.item
-        self._head = self._head.next
-        self._n -= 1
-        return item
-
-    def is_empty(self):
-        return self._head is None
-
-    def size(self):
-        return self._n`,
     },
     complexity: {
       question: "What is the time complexity of push and pop? How does memory usage compare to the array-based stack?",
@@ -167,36 +119,6 @@ class LinkedStack:
     a = copy
     head = 0
     tail = n`,
-      python: `class ArrayQueue:
-    def __init__(self):
-        self._a = [None, None]
-        self._head = 0
-        self._tail = 0
-        self._n = 0
-
-    def enqueue(self, item):
-        if self._n == len(self._a):
-            self._resize(2 * len(self._a))
-        self._a[self._tail] = item
-        self._tail = (self._tail + 1) % len(self._a)
-        self._n += 1
-
-    def dequeue(self):
-        item = self._a[self._head]
-        self._a[self._head] = None
-        self._head = (self._head + 1) % len(self._a)
-        self._n -= 1
-        if self._n > 0 and self._n == len(self._a) // 4:
-            self._resize(len(self._a) // 2)
-        return item
-
-    def _resize(self, capacity):
-        copy = [None] * capacity
-        for i in range(self._n):
-            copy[i] = self._a[(self._head + i) % len(self._a)]
-        self._a = copy
-        self._head = 0
-        self._tail = self._n`,
     },
     complexity: {
       question: "What is the amortised time complexity of enqueue and dequeue? Why is the circular buffer necessary?",
@@ -228,30 +150,6 @@ dequeue ():
   targetNode = head
   head = head.next
   return targetNode`,
-      python: `class Node:
-    def __init__(self, item):
-        self.item = item
-        self.next = None
-
-class LinkedQueue:
-    def __init__(self):
-        self.head = None
-        self.tail = None
-
-    def enqueue(self, item):
-        old_tail = self.tail
-        self.tail = Node(item)
-        if self.head is None:
-            self.head = self.tail
-        else:
-            old_tail.next = self.tail
-
-    def dequeue(self):
-        item = self.head.item
-        self.head = self.head.next
-        if self.head is None:
-            self.tail = None
-        return item`,
     },
     complexity: {
       question: "What is the time complexity of enqueue and dequeue?",
@@ -356,103 +254,6 @@ class UndoRedo:
     action = redoStack.pop()
     undoStack.push(action)
     return action`,
-      python: `# --- Scenario 1: Web browser back button ---
-# ADT: Stack (LIFO)
-# Justification: most recently visited page is first to go back to.
-
-class Node:
-    def __init__(self, item):
-        self.item = item
-        self.next = None
-
-class BrowserHistory:
-    def __init__(self):
-        self._top = None
-
-    def visit_page(self, url):
-        old_top = self._top
-        self._top = Node(url)
-        self._top.next = old_top
-
-    def go_back(self):
-        if self._top is None:
-            return None
-        url = self._top.item
-        self._top = self._top.next
-        return url
-
-
-# --- Scenario 2: Print queue ---
-# ADT: Queue (FIFO)
-# Justification: documents printed in submission order.
-
-class PrintQueue:
-    def __init__(self):
-        self._head = None
-        self._tail = None
-
-    def submit_job(self, doc):
-        old_tail = self._tail
-        self._tail = Node(doc)
-        if self._head is None:
-            self._head = self._tail
-        else:
-            old_tail.next = self._tail
-
-    def print_next(self):
-        if self._head is None:
-            return None
-        doc = self._head.item
-        self._head = self._head.next
-        if self._head is None:
-            self._tail = None
-        return doc
-
-
-# --- Scenario 3: Undo/Redo system ---
-# ADT: Two stacks
-# Justification: undo = LIFO retrieval of past actions,
-# redo = LIFO retrieval of undone actions. Two stacks cooperate.
-
-class LinkedStack:
-    def __init__(self):
-        self._top = None
-
-    def push(self, item):
-        old_top = self._top
-        self._top = Node(item)
-        self._top.next = old_top
-
-    def pop(self):
-        item = self._top.item
-        self._top = self._top.next
-        return item
-
-    def is_empty(self):
-        return self._top is None
-
-class UndoRedo:
-    def __init__(self):
-        self._undo = LinkedStack()
-        self._redo = LinkedStack()
-
-    def do_action(self, action):
-        self._undo.push(action)
-        self._redo = LinkedStack()  # clear redo on new action
-
-    def undo(self):
-        if self._undo.is_empty():
-            return None
-        action = self._undo.pop()
-        self._redo.push(action)
-        return action
-
-    def redo(self):
-        if self._redo.is_empty():
-            return None
-        action = self._redo.pop()
-        self._undo.push(action)
-        return action`,
     },
     complexity: {
       question: "State the time complexity of every operation in each of your three implementations.",
@@ -545,77 +346,6 @@ class QueueStack:
     update the second-to-last node's next pointer to null,
     but with only forward pointers, we must traverse from
     head to find it. This linear scan makes popBack O(n).`,
-      python: `class DNode:
-    def __init__(self, item=None):
-        self.item = item
-        self.prev = None
-        self.next = None
-
-class QueueStack:
-    def __init__(self):
-        # Sentinel nodes — never hold real data
-        self._head = DNode()  # front sentinel
-        self._tail = DNode()  # back sentinel
-        self._head.next = self._tail
-        self._tail.prev = self._head
-        self._n = 0
-
-    def push_front(self, item):
-        node = DNode(item)
-        node.next = self._head.next
-        node.prev = self._head
-        self._head.next.prev = node
-        self._head.next = node
-        self._n += 1
-
-    def push_back(self, item):
-        node = DNode(item)
-        node.prev = self._tail.prev
-        node.next = self._tail
-        self._tail.prev.next = node
-        self._tail.prev = node
-        self._n += 1
-
-    def pop_front(self):
-        if self._n == 0:
-            raise IndexError("pop from empty QueueStack")
-        node = self._head.next
-        self._head.next = node.next
-        node.next.prev = self._head
-        self._n -= 1
-        return node.item
-
-    def pop_back(self):
-        if self._n == 0:
-            raise IndexError("pop from empty QueueStack")
-        node = self._tail.prev
-        self._tail.prev = node.prev
-        node.prev.next = self._tail
-        self._n -= 1
-        return node.item
-
-    def size(self):
-        return self._n
-
-    def is_empty(self):
-        return self._n == 0
-
-
-# --- Cost Analysis ---
-#
-# (b) All four operations are O(1) worst-case.
-#     Each operation performs a constant number of pointer
-#     reassignments regardless of n. Sentinels eliminate
-#     all edge-case branches (empty, single element).
-#
-# (c) With a singly linked list (no prev pointers):
-#     - push_front: O(1) — insert at head
-#     - push_back:  O(1) — insert at tail (if tail pointer maintained)
-#     - pop_front:  O(1) — remove head
-#     - pop_back:   O(n) — must traverse from head to find the
-#       second-to-last node, since there is no prev pointer.
-#       This makes a singly linked list unsuitable for a deque
-#       that needs efficient removal from both ends.`,
     },
     complexity: {
       question: "If we added a 'peekMiddle()' operation that returns the middle element, what would its complexity be? Could we improve it?",
@@ -670,39 +400,6 @@ that only uses a subset of these operations is a special case:
   Queue (FIFO) via deque:
     enqueue(item)  =  addLast(item)
     dequeue()      =  removeFirst()
-
-Since a deque supports all four operations, restricting to
-any two gives either stack or queue behaviour. This is why
-the deque is the most general of the three linear ADTs.`,
-      python: `(a) Core operations of a Deque:
-
-  1. add_first(item)  — insert item at the front
-  2. add_last(item)   — insert item at the back
-  3. remove_first()   — remove and return the front item
-  4. remove_last()    — remove and return the back item
-
-  Supporting operations: is_empty(), size(), peek_first(), peek_last().
-
-(b) A deque generalises both a stack and a queue because it
-permits insertion and removal at BOTH ends. Any access pattern
-that only uses a subset of these operations is a special case:
-
-  - A stack restricts access to ONE end only (LIFO).
-  - A queue restricts to adding at one end and removing from
-    the other (FIFO).
-  - A deque imposes no such restriction — it supports both
-    patterns and more.
-
-(c) Correspondence:
-
-  Stack (LIFO) via deque:
-    push(item)  =  add_first(item)
-    pop()       =  remove_first()
-    (Equivalently: add_last + remove_last also gives a stack.)
-
-  Queue (FIFO) via deque:
-    enqueue(item)  =  add_last(item)
-    dequeue()      =  remove_first()
 
 Since a deque supports all four operations, restricting to
 any two gives either stack or queue behaviour. This is why

@@ -8,57 +8,39 @@ export const unionFindQuestions: (ImplementationQuestion | TableTraceQuestion)[]
     topic: "unionfind",
     tier: "full",
     title: "Weighted Quick-Union",
-    prompt: "Implement weighted quick-union with union and find operations. Use a parent[] array and a size[] array to always attach the smaller tree under the larger tree.",
+    prompt: "Implement weighted quick-union with init, find, and union operations. Use an id[] array (id[i] = parent of i) and a size[] array to always attach the smaller tree under the larger tree. find(p) should return the canonical component identifier (the root of p's tree).",
     hints: [
-      "Function signatures: find(parent[], i) → root, union(parent[], size[], p, q)",
-      "find: follow parent links until parent[i] == i. union: find roots of p and q, attach smaller tree under larger.",
-      "find: while parent[i] != i: i = parent[i]; return i\nunion: rootP = find(p), rootQ = find(q); if rootP == rootQ: return; if size[rootP] < size[rootQ]: parent[rootP] = rootQ; size[rootQ] += size[rootP]; else: parent[rootQ] = rootP; size[rootP] += size[rootQ]",
+      "Three parts: init (id[i]=i, size[i]=1), find(i) chases parent pointers up to the root and returns it, union(p,q) calls find on both and links the smaller tree under the larger. To check whether p and q are in the same component, compare find(p) == find(q).",
+      "find: while i != id[i]: i = id[i]; return i. union: get roots r_p = find(p), r_q = find(q); if equal, return; otherwise attach smaller tree under larger and update size.",
+      "find: while i!=id[i]: i=id[i]; return i\nunion: r_p=find(p), r_q=find(q); if r_p==r_q: return; if size[r_p]<size[r_q]: id[r_p]=r_q; size[r_q]+=size[r_p]; else: id[r_q]=r_p; size[r_p]+=size[r_q]",
     ],
     solutions: {
       pseudocode: `#init
 id = []
-size =[]
-for i in range (N):
+size = []
+for i in range(N):
     id.append(i)
     size.append(1)
 
-#root
-def root(i):
-    while i!=id[i]:
-        i=id[i]
+#find — returns canonical component id (root) of i
+def find(i):
+    while i != id[i]:
+        i = id[i]
     return i
-
-#find
-def find(u,v):
-    return root(u)==root(v)
 
 #union
-def union(u,v):
-    r_u=root(u)
-    r_v=root(v)
-    if r_u==r_v return
-    if size[r_u]<size[r_v]:
-        id[r_u]=r_v
-        size[r_v]+=size[r_u]
-    else
-        id[r_v]=r_u
-        size[r_u]+=size[r_v]`,
-      python: `def find(parent: list[int], i: int) -> int:
-    while parent[i] != i:
-        i = parent[i]
-    return i
-
-def union(parent: list[int], size: list[int], p: int, q: int) -> None:
-    root_p = find(parent, p)
-    root_q = find(parent, q)
-    if root_p == root_q:
-        return
-    if size[root_p] < size[root_q]:
-        parent[root_p] = root_q
-        size[root_q] += size[root_p]
+def union(p, q):
+    r_p = find(p)
+    r_q = find(q)
+    if r_p == r_q: return
+    if size[r_p] < size[r_q]:
+        id[r_p] = r_q
+        size[r_q] += size[r_p]
     else:
-        parent[root_q] = root_p
-        size[root_p] += size[root_q]`,
+        id[r_q] = r_p
+        size[r_p] += size[r_q]
+
+# "are p and q in the same component?"  →  find(p) == find(q)`,
     },
     complexity: {
       question: "What is the time complexity of find and union in weighted quick-union?",
@@ -76,43 +58,29 @@ def union(parent: list[int], size: list[int], p: int, q: int) -> None:
     title: "Quick-Find",
     prompt: "Explain the quick-find approach to union-find. Describe the data structure, how find and union work, and state the time complexity of each operation. Why is quick-find impractical for large inputs?",
     hints: [
-      "Think about what the id[] array stores: id[i] is the component identifier for element i. Two elements are connected iff they have the same id.",
+      "Think about what the id[] array stores: id[i] is the component identifier for element i. Two elements are in the same component iff find(p) == find(q).",
       "find is trivial — just return id[i]. But what does union have to do to merge two components?",
       "union(p, q) must scan the entire id[] array and change every entry equal to id[p] to id[q] (or vice versa). That's O(N) per union call.",
     ],
     solutions: {
       pseudocode: `#init
 id = []
-for i in range (N):
+for i in range(N):
     id.append(i)
 
-#union
-def union(u,v):
-    uid=id[u]
-    vid=id[v]
+#find — returns component id of i  (O(1))
+def find(i):
+    return id[i]
+
+#union  (O(N))
+def union(p, q):
+    pid = id[p]
+    qid = id[q]
     for i in range(N):
-        if id[i]==uid:
-            id[i]=vid
+        if id[i] == pid:
+            id[i] = qid
 
-#find
-def find(u,v):
-    return id[u]==id[v]`,
-      python: `Quick-find maintains an id[] array where id[i] is the component identifier for element i.
-
-find(i): return id[i]  →  O(1), just an array access.
-
-union(p, q):
-  - Let pid = id[p], qid = id[q].
-  - Scan the entire id[] array: for every index i where id[i] == pid, set id[i] = qid.
-  - This is O(N) because it touches every element.
-
-connected(p, q): return id[p] == id[q]  →  O(1).
-
-Example: id = [0, 1, 2, 3, 4]
-  union(3, 4): scan array, change all 3s to 4 → id = [0, 1, 2, 4, 4]
-  union(0, 3): scan array, change all 0s to 4 → id = [4, 1, 2, 4, 4]
-
-Why impractical: N union operations on N objects costs O(N²) total. For 10⁹ objects, this is far too slow. Quick-find has fast find but unacceptably slow union.`,
+# "are p and q in the same component?"  →  find(p) == find(q)`,
     },
     complexity: {
       question: "",
@@ -128,58 +96,31 @@ Why impractical: N union operations on N objects costs O(N²) total. For 10⁹ o
     topic: "unionfind",
     tier: "conceptual",
     title: "Quick-Union",
-    prompt: "Explain the quick-union approach to union-find. Describe the parent[] tree structure, how find and union work, and explain why quick-union can degrade to O(N) per operation. What causes this worst case?",
+    prompt: "Explain the quick-union approach to union-find. Describe the id[] tree structure (id[i] = parent of i), how find and union work, and explain why quick-union can degrade to O(N) per operation. What causes this worst case?",
     hints: [
-      "parent[i] stores the parent of element i. The root of a tree satisfies parent[r] == r. find chases parent pointers up to the root.",
-      "union(p, q) just sets the root of p's tree to point to the root of q's tree — one link change, but find is the bottleneck.",
+      "id[i] stores the parent of element i. The root of a tree satisfies id[r] == r. find(i) chases parent pointers up to the root and returns the canonical component id.",
+      "union(p, q) just sets the root of p's tree to point to the root of q's tree — one link change, but find() is the bottleneck because it walks to the root.",
       "The worst case happens when unions always create a tall, skinny tree (like a linked list). e.g., union(0,1), union(1,2), union(2,3),... creates a chain of depth N.",
     ],
     solutions: {
       pseudocode: `#init
 id = []
-for i in range (N):
+for i in range(N):
     id.append(i)
 
-#root
-def root(i):
-    while i!=id[i]:
-        i=id[i]
+#find — walks to the root, returns canonical component id
+def find(i):
+    while i != id[i]:
+        i = id[i]
     return i
 
-#find
-def find(u,v):
-    return root(u)==root(v)
-
 #union
-def union(u,v):
-    r_u=root(u)
-    r_v=root(v)
-    id[r_u]=r_v`,
-      python: `Quick-union uses a parent[] array representing a forest of trees. parent[i] is the parent of i; roots satisfy parent[r] == r.
+def union(p, q):
+    r_p = find(p)
+    r_q = find(q)
+    id[r_p] = r_q
 
-find(i): chase parent pointers until parent[i] == i → return i.
-  while parent[i] != i: i = parent[i]
-  This is O(tree height).
-
-union(p, q):
-  rootP = find(p)
-  rootQ = find(q)
-  parent[rootP] = rootQ   ← just one link change, O(1) after find
-  Total: O(tree height) due to the two find calls.
-
-connected(p, q): return find(p) == find(q).
-
-Why it degrades:
-  There is no guarantee that trees stay balanced. If you union in a bad order, trees can become tall and skinny — essentially linked lists.
-
-  Example (worst case): starting from parent = [0, 1, 2, 3, 4]
-    union(0, 1): parent = [1, 1, 2, 3, 4]    tree: 0→1
-    union(1, 2): parent = [1, 2, 2, 3, 4]    tree: 0→1→2
-    union(2, 3): parent = [1, 2, 3, 3, 4]    tree: 0→1→2→3
-    union(3, 4): parent = [1, 2, 3, 4, 4]    tree: 0→1→2→3→4
-
-  Now find(0) must follow 4 pointers — O(N). N find operations costs O(N²).
-  This is what motivates weighted quick-union: always attach the smaller tree under the larger one.`,
+# "are p and q in the same component?"  →  find(p) == find(q)`,
     },
     complexity: {
       question: "",
@@ -203,32 +144,6 @@ Why it degrades:
     ],
     solutions: {
       pseudocode: `Path compression modifies the find operation so that trees become nearly flat over time.
-
-Two-pass path compression (full):
-  find(i):
-    root = i
-    while parent[root] != root: root = parent[root]    ← find the root
-    while parent[i] != root:                             ← second pass: point everything to root
-      next = parent[i]
-      parent[i] = root
-      i = next
-    return root
-
-One-pass path halving (simpler, same asymptotic bound):
-  find(i):
-    while parent[i] != i:
-      parent[i] = parent[parent[i]]    ← make every other node point to its grandparent
-      i = parent[i]
-    return root
-
-Effect: after find(i), every node on the path from i to root has its parent set to root (or grandparent). Subsequent finds on the same nodes are O(1).
-
-Amortised complexity:
-  With weighted union + path compression, M union-find operations on N objects takes O(N + M·α(N)), where α is the inverse Ackermann function. α(N) ≤ 5 for any physically possible N, so this is effectively O(1) amortised per operation.
-
-Why it matters for Kruskal:
-  Kruskal's processes E edges, each requiring a find + possibly a union. Without path compression, this is O(E log V). With path compression, it's O(E·α(V)) ≈ O(E), making union-find essentially free — Kruskal's bottleneck becomes the initial sort of edges at O(E log E).`,
-      python: `Path compression modifies the find operation so that trees become nearly flat over time.
 
 Two-pass path compression (full):
   find(i):

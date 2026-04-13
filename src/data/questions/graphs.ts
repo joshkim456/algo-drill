@@ -24,11 +24,6 @@ export const graphQuestions: (ImplementationQuestion | TableTraceQuestion)[] = [
   for each v in graph.adj(s):
     if not visited[v]:
       dfs(graph, v, visited)`,
-      python: `def dfs(graph: list[list[int]], s: int, visited: list[bool]) -> None:
-    visited[s] = True
-    for v in graph[s]:
-        if not visited[v]:
-            dfs(graph, v, visited)`,
     },
     complexity: {
       question: "What is the time complexity of DFS?",
@@ -65,20 +60,6 @@ export const graphQuestions: (ImplementationQuestion | TableTraceQuestion)[] = [
           edgeTo[w] = v
           stack.push(w)
   return (visited, edgeTo)`,
-      python: `def dfs_iterative(graph: list[list[int]], s: int) -> tuple[list[bool], list[int]]:
-    V = len(graph)
-    visited = [False] * V
-    edge_to = [-1] * V
-    stack = [s]
-    while stack:
-        v = stack.pop()
-        if not visited[v]:
-            visited[v] = True
-            for w in graph[v]:
-                if not visited[w]:
-                    edge_to[w] = v
-                    stack.append(w)
-    return visited, edge_to`,
     },
     complexity: {
       question: "What is the time complexity of iterative DFS, and how does it differ from recursive DFS?",
@@ -96,41 +77,25 @@ export const graphQuestions: (ImplementationQuestion | TableTraceQuestion)[] = [
     title: "BFS (Iterative with Queue)",
     prompt: "Implement breadth-first search on a graph represented as an adjacency list. Track distances from source vertex s and the edgeTo[] array for path reconstruction.",
     hints: [
-      "Function signature: bfs(graph, s) → (distTo[], edgeTo[])",
+      "Function signature: bfs(graph, s) → (distToSource[], edgeTo[])",
       "Use a queue. Enqueue s with distance 0. For each dequeued vertex, enqueue all unvisited neighbours with distance + 1.",
-      "queue.enqueue(s)\ndistTo[s] = 0\nwhile queue not empty:\n  v = queue.dequeue()\n  for each w in adj(v):\n    if distTo[w] == -1:\n      distTo[w] = distTo[v] + 1\n      edgeTo[w] = v\n      queue.enqueue(w)",
+      "queue.enqueue(s)\ndistToSource[s] = 0\nwhile queue not empty:\n  v = queue.dequeue()\n  for each w in adj(v):\n    if distToSource[w] == -1:\n      distToSource[w] = distToSource[v] + 1\n      edgeTo[w] = v\n      queue.enqueue(w)",
     ],
     solutions: {
       pseudocode: `function bfs(graph, s, V):
-  distTo = new int[V], fill with -1
+  distToSource = new int[V], fill with -1
   edgeTo = new int[V], fill with -1
-  distTo[s] = 0
+  distToSource[s] = 0
   queue = new Queue()
   queue.enqueue(s)
   while not queue.isEmpty():
     v = queue.dequeue()
     for each w in graph.adj(v):
-      if distTo[w] == -1:
-        distTo[w] = distTo[v] + 1
+      if distToSource[w] == -1:
+        distToSource[w] = distToSource[v] + 1
         edgeTo[w] = v
         queue.enqueue(w)
-  return (distTo, edgeTo)`,
-      python: `from collections import deque
-
-def bfs(graph: list[list[int]], s: int) -> tuple[list[int], list[int]]:
-    V = len(graph)
-    dist_to = [-1] * V
-    edge_to = [-1] * V
-    dist_to[s] = 0
-    queue = deque([s])
-    while queue:
-        v = queue.popleft()
-        for w in graph[v]:
-            if dist_to[w] == -1:
-                dist_to[w] = dist_to[v] + 1
-                edge_to[w] = v
-                queue.append(w)
-    return dist_to, edge_to`,
+  return (distToSource, edgeTo)`,
     },
     complexity: {
       question: "What is the time complexity of BFS?",
@@ -170,25 +135,6 @@ def bfs(graph: list[list[int]], s: int) -> tuple[list[int], list[int]]:
         else if colour[w] == colour[v]:
           return false
   return true`,
-      python: `from collections import deque
-
-def is_bipartite(graph: list[list[int]]) -> bool:
-    V = len(graph)
-    colour = [-1] * V
-    for s in range(V):
-        if colour[s] != -1:
-            continue
-        colour[s] = 0
-        queue = deque([s])
-        while queue:
-            v = queue.popleft()
-            for w in graph[v]:
-                if colour[w] == -1:
-                    colour[w] = 1 - colour[v]
-                    queue.append(w)
-                elif colour[w] == colour[v]:
-                    return False
-    return True`,
     },
     complexity: {
       question: "What is the time complexity of the bipartiteness check?",
@@ -227,23 +173,6 @@ def is_bipartite(graph: list[list[int]]) -> bool:
     for each d in distTo:
       maxDist = max(maxDist, d)
   return maxDist`,
-      python: `from collections import deque
-
-def diameter(graph: list[list[int]]) -> int:
-    V = len(graph)
-    max_dist = 0
-    for s in range(V):
-        dist_to = [-1] * V
-        dist_to[s] = 0
-        queue = deque([s])
-        while queue:
-            v = queue.popleft()
-            for w in graph[v]:
-                if dist_to[w] == -1:
-                    dist_to[w] = dist_to[v] + 1
-                    queue.append(w)
-        max_dist = max(max_dist, max(dist_to))
-    return max_dist`,
     },
     complexity: {
       question: "What is the time complexity of computing the graph diameter this way?",
@@ -259,21 +188,21 @@ def diameter(graph: list[list[int]]) -> int:
     topic: "graphs",
     tier: "full",
     title: "Dijkstra's Algorithm",
-    prompt: "Implement Dijkstra's shortest-path algorithm for a weighted directed graph with non-negative edge weights. Use a priority queue (indexed min-PQ or simple min-PQ). Return distTo[] and edgeTo[] arrays.",
+    prompt: "Implement Dijkstra's shortest-path algorithm for a weighted directed graph with non-negative edge weights. Use a min-priority queue (one that supports decrease-key, or a simpler lazy variant). Return distTo[] and edgeTo[] arrays.",
     hints: [
       "Function signature: dijkstra(graph, s, V) → (distTo[], edgeTo[]). Initialise distTo[s] = 0, all others = ∞.",
       "Use a min-priority queue keyed by distTo[]. Repeatedly extract the vertex v with minimum distance. For each neighbour w, relax edge v→w: if distTo[v] + weight(v,w) < distTo[w], update distTo[w] and edgeTo[w].",
-      "pq.insert(s, 0)\nwhile not pq.isEmpty():\n  v = pq.delMin()\n  for each edge v→w with weight wt:\n    if distTo[v] + wt < distTo[w]:\n      distTo[w] = distTo[v] + wt\n      edgeTo[w] = v\n      pq.decreaseKey(w, distTo[w])  // or insert if not present",
+      "pq.insert(s, 0)\nwhile not pq.isEmpty():\n  v = pq.extractMin()\n  for each edge v→w with weight wt:\n    if distTo[v] + wt < distTo[w]:\n      distTo[w] = distTo[v] + wt\n      edgeTo[w] = v\n      pq.decreaseKey(w, distTo[w])  // or insert if not present",
     ],
     solutions: {
       pseudocode: `function dijkstra(graph, s, V):
   distTo = new double[V], fill with ∞
   edgeTo = new int[V], fill with -1
   distTo[s] = 0
-  pq = new IndexedMinPQ()
+  pq = new MinPriorityQueue()     // supports decrease-key
   pq.insert(s, 0.0)
   while not pq.isEmpty():
-    v = pq.delMin()
+    v = pq.extractMin()
     for each edge (v, w, weight) in graph.adj(v):
       if distTo[v] + weight < distTo[w]:
         distTo[w] = distTo[v] + weight
@@ -283,28 +212,10 @@ def diameter(graph: list[list[int]]) -> int:
         else:
           pq.insert(w, distTo[w])
   return (distTo, edgeTo)`,
-      python: `import heapq
-
-def dijkstra(graph: list[list[tuple[int, float]]], s: int) -> tuple[list[float], list[int]]:
-    V = len(graph)
-    dist_to = [float('inf')] * V
-    edge_to = [-1] * V
-    dist_to[s] = 0.0
-    pq = [(0.0, s)]
-    while pq:
-        d, v = heapq.heappop(pq)
-        if d > dist_to[v]:
-            continue  # stale entry
-        for w, weight in graph[v]:
-            if dist_to[v] + weight < dist_to[w]:
-                dist_to[w] = dist_to[v] + weight
-                edge_to[w] = v
-                heapq.heappush(pq, (dist_to[w], w))
-    return dist_to, edge_to`,
     },
     complexity: {
-      question: "What is the time complexity of Dijkstra's algorithm with an indexed min-PQ (binary heap)?",
-      answer: "O(E log V) — each of the E edge relaxations may trigger a decrease-key operation costing O(log V). Each of the V delMin operations also costs O(log V).",
+      question: "What is the time complexity of Dijkstra's algorithm with a binary-heap min-priority queue that supports decrease-key?",
+      answer: "O(E log V) — each of the E edge relaxations may trigger a decrease-key operation costing O(log V). Each of the V extract-min operations also costs O(log V).",
     },
     source: "22-23 Q3a (21 marks), 21-22 Practice Q3b",
   },
@@ -327,10 +238,10 @@ def dijkstra(graph: list[list[tuple[int, float]]], s: int) -> tuple[list[float],
   distTo = new double[V], fill with ∞
   edgeTo = new int[V], fill with -1
   distTo[s] = 0
-  pq = new MinPQ()       // entries: (distance, vertex, lastEdgeWeight)
+  pq = new MinPriorityQueue()  // entries: (distance, vertex, lastEdgeWeight)
   pq.insert((0, s, -∞))
   while not pq.isEmpty():
-    (d, v, lastWt) = pq.delMin()
+    (d, v, lastWt) = pq.extractMin()
     if d > distTo[v]:
       continue            // stale entry — already found a better path
     for each edge (v, w, weight) in graph.adj(v):
@@ -341,31 +252,10 @@ def dijkstra(graph: list[list[tuple[int, float]]], s: int) -> tuple[list[float],
           edgeTo[w] = v
           pq.insert((newDist, w, weight))
   return (distTo, edgeTo)`,
-      python: `import heapq
-
-def monotonic_sp(graph: list[list[tuple[int, float]]], s: int) -> tuple[list[float], list[int]]:
-    V = len(graph)
-    dist_to = [float('inf')] * V
-    edge_to = [-1] * V
-    dist_to[s] = 0.0
-    # (distance, vertex, last_edge_weight)
-    pq = [(0.0, s, float('-inf'))]
-    while pq:
-        d, v, last_wt = heapq.heappop(pq)
-        if d > dist_to[v]:
-            continue
-        for w, weight in graph[v]:
-            if weight > last_wt:
-                new_dist = dist_to[v] + weight
-                if new_dist < dist_to[w]:
-                    dist_to[w] = new_dist
-                    edge_to[w] = v
-                    heapq.heappush(pq, (new_dist, w, weight))
-    return dist_to, edge_to`,
     },
     complexity: {
       question: "What is the time complexity of monotonic shortest path?",
-      answer: "O(E log E) in the worst case — each edge may generate a PQ entry (since the same vertex can be reached with different last-weights). With E entries, each insert/delMin is O(log E).",
+      answer: "O(E log E) in the worst case — each edge may generate a PQ entry (since the same vertex can be reached with different last-weights). With E entries, each insert/extract-min is O(log E).",
     },
     source: "22-23 Q3b (14 marks, verbatim)",
   },
@@ -395,38 +285,10 @@ def monotonic_sp(graph: list[list[tuple[int, float]]], s: int) -> tuple[list[flo
       if mst.size() == V - 1:
         break
   return mst`,
-      python: `def kruskal(edges: list[tuple[int, int, float]], V: int) -> list[tuple[int, int, float]]:
-    edges.sort(key=lambda e: e[2])
-    parent = list(range(V))
-    size = [1] * V
-
-    def find(x: int) -> int:
-        while parent[x] != x:
-            parent[x] = parent[parent[x]]  # path compression
-            x = parent[x]
-        return x
-
-    def union(a: int, b: int) -> bool:
-        ra, rb = find(a), find(b)
-        if ra == rb:
-            return False
-        if size[ra] < size[rb]:
-            ra, rb = rb, ra
-        parent[rb] = ra
-        size[ra] += size[rb]
-        return True
-
-    mst = []
-    for u, v, w in edges:
-        if union(u, v):
-            mst.append((u, v, w))
-            if len(mst) == V - 1:
-                break
-    return mst`,
     },
     complexity: {
       question: "What is the time complexity of Kruskal's algorithm?",
-      answer: "O(E log E) — dominated by sorting edges. The Union-Find operations (with weighted union + path compression) are nearly O(1) amortised per operation, so processing edges is O(E α(V)) ≈ O(E).",
+      answer: "O(E log E) — dominated by sorting edges. The Union-Find operations (with weighted union) cost O(log V) each, so processing edges is O(E log V). Since log E ≤ 2 log V, the sort dominates.",
     },
     source: "21-22 Q3b (15 marks), 23-24 Q3a",
   },
@@ -442,13 +304,13 @@ def monotonic_sp(graph: list[list[tuple[int, float]]], s: int) -> tuple[list[flo
     hints: [
       "Function signature: prim(graph, V) → mstEdges[]. Mark vertex 0 as visited and add all its edges to the PQ.",
       "While PQ is not empty and MST has fewer than V-1 edges: extract min-weight edge (u, v, w). If v is already visited, skip (lazy deletion). Otherwise, mark v visited, add edge to MST, and enqueue all edges from v to unvisited vertices.",
-      "visit(0)\nwhile not pq.isEmpty() and |mst| < V-1:\n  (u, v, w) = pq.delMin()\n  if visited[v]: continue\n  visited[v] = true\n  mst.add((u, v, w))\n  for each (v, x, wt) in adj(v):\n    if not visited[x]: pq.insert((v, x, wt))",
+      "visit(0)\nwhile not pq.isEmpty() and |mst| < V-1:\n  (u, v, w) = pq.extractMin()\n  if visited[v]: continue\n  visited[v] = true\n  mst.add((u, v, w))\n  for each (v, x, wt) in adj(v):\n    if not visited[x]: pq.insert((v, x, wt))",
     ],
     solutions: {
       pseudocode: `function prim(graph, V):
   visited = new boolean[V], fill with false
   mst = []
-  pq = new MinPQ()    // keyed by edge weight
+  pq = new MinPriorityQueue()    // keyed by edge weight
 
   // visit vertex 0
   visited[0] = true
@@ -456,7 +318,7 @@ def monotonic_sp(graph: list[list[tuple[int, float]]], s: int) -> tuple[list[flo
     pq.insert((0, w, weight))
 
   while not pq.isEmpty() and mst.size() < V - 1:
-    (u, v, weight) = pq.delMin()
+    (u, v, weight) = pq.extractMin()
     if visited[v]:
       continue        // lazy deletion
     visited[v] = true
@@ -465,32 +327,10 @@ def monotonic_sp(graph: list[list[tuple[int, float]]], s: int) -> tuple[list[flo
       if not visited[x]:
         pq.insert((v, x, wt))
   return mst`,
-      python: `import heapq
-
-def prim(graph: list[list[tuple[int, float]]], V: int) -> list[tuple[int, int, float]]:
-    visited = [False] * V
-    mst = []
-    pq = []  # (weight, u, v)
-
-    # visit vertex 0
-    visited[0] = True
-    for w, weight in graph[0]:
-        heapq.heappush(pq, (weight, 0, w))
-
-    while pq and len(mst) < V - 1:
-        weight, u, v = heapq.heappop(pq)
-        if visited[v]:
-            continue
-        visited[v] = True
-        mst.append((u, v, weight))
-        for x, wt in graph[v]:
-            if not visited[x]:
-                heapq.heappush(pq, (wt, v, x))
-    return mst`,
     },
     complexity: {
       question: "What is the time complexity of lazy Prim's algorithm?",
-      answer: "O(E log E) — each edge may be inserted into the PQ once, and each insert/delMin is O(log E). The eager version with an indexed min-PQ achieves O(E log V).",
+      answer: "O(E log E) time, O(E) extra space — each edge may be inserted into the PQ once, and each insert/extract-min is O(log E). The eager version (with a min-PQ supporting decrease-key) achieves O(E log V).",
     },
     source: "23-24 Q3c (12 marks)",
   },
@@ -529,23 +369,6 @@ def prim(graph: list[list[tuple[int, float]]], V: int) -> list[tuple[int, int, f
   while not reversePost.isEmpty():
     order.add(reversePost.pop())
   return order`,
-      python: `def topological_sort(graph: list[list[int]]) -> list[int]:
-    V = len(graph)
-    visited = [False] * V
-    reverse_post = []
-
-    def dfs(v: int) -> None:
-        visited[v] = True
-        for w in graph[v]:
-            if not visited[w]:
-                dfs(w)
-        reverse_post.append(v)
-
-    for v in range(V):
-        if not visited[v]:
-            dfs(v)
-
-    return reverse_post[::-1]`,
     },
     complexity: {
       question: "What is the time complexity of topological sort via DFS?",
@@ -592,26 +415,6 @@ Correctness:
 
 Time complexity: O(V + E)
 - Two DFS passes (each O(V + E)) plus O(V + E) to build G^R.`,
-      python: `Kosaraju's Algorithm — Two-Pass SCC Detection:
-
-1. Compute reverse post-order of G^R (the reverse graph):
-   - Build G^R by reversing all edges in G.
-   - Run DFS on G^R, recording finish times.
-   - The reverse post-order of G^R is the reverse of the DFS finish order.
-
-2. Run DFS on original graph G in that order:
-   - Process vertices in the reverse post-order from step 1.
-   - Each DFS tree in this pass is one strongly connected component.
-   - All vertices reached from a single DFS root belong to the same SCC.
-
-Correctness:
-- The reverse post-order of G^R gives a topological order of the
-  "meta-graph" (DAG of SCCs). Processing in this order ensures we
-  start from an SCC with no incoming edges from other SCCs, so
-  DFS on G cannot escape into a different SCC.
-
-Time complexity: O(V + E)
-- Two DFS passes (each O(V + E)) plus O(V + E) to build G^R.`,
     },
     complexity: {
       question: "",
@@ -635,38 +438,6 @@ Time complexity: O(V + E)
     ],
     solutions: {
       pseudocode: `Bellman-Ford Algorithm:
-
-What it does: Computes shortest paths from a source s to all vertices
-in a weighted directed graph, even with NEGATIVE edge weights.
-
-Algorithm (V-1 rounds of full relaxation):
-  distTo[s] = 0, distTo[all others] = ∞
-  Repeat V-1 times:
-    for each edge (u, v, w) in ALL edges:
-      if distTo[u] + w < distTo[v]:
-        distTo[v] = distTo[u] + w
-        edgeTo[v] = u
-
-Why V-1 rounds suffice:
-  A shortest path visits at most V-1 edges (no repeated vertices in
-  the absence of negative cycles). Round k correctly computes all
-  shortest paths using at most k edges. After V-1 rounds, all
-  shortest paths are found.
-
-Negative cycle detection:
-  Run one more (V-th) round of relaxation. If ANY edge is still
-  relaxed, a negative-weight cycle is reachable from s.
-
-When to use over Dijkstra:
-  - Graph has negative-weight edges (Dijkstra assumes non-negative).
-  - Need to detect negative cycles.
-  - Dijkstra fails with negative edges because its greedy "settle
-    the closest vertex" assumption breaks — a later edge with
-    negative weight can reduce a previously-settled distance.
-
-Time complexity: O(VE) — V-1 rounds, each examining all E edges.
-Space: O(V) for distTo[] and edgeTo[].`,
-      python: `Bellman-Ford Algorithm:
 
 What it does: Computes shortest paths from a source s to all vertices
 in a weighted directed graph, even with NEGATIVE edge weights.
@@ -755,41 +526,6 @@ Space complexity: O(V^2) — the distance matrix (can be done in-place).
 
 Handles negative weights (but not negative cycles).
 Detects negative cycles if dist[i][i] < 0 for any i after running.`,
-      python: `Floyd-Warshall Algorithm — All-Pairs Shortest Paths:
-
-Problem: Find shortest paths between ALL pairs of vertices.
-
-DP Recurrence:
-  Let dist_k(i, j) = shortest path from i to j using only
-  intermediate vertices from {0, 1, ..., k}.
-
-  dist_k(i, j) = min(
-    dist_{k-1}(i, j),          // best path NOT through k
-    dist_{k-1}(i, k) + dist_{k-1}(k, j)  // path through k
-  )
-
-  Base case: dist_{-1}(i, j) = weight(i, j) if edge exists, else ∞.
-             dist_{-1}(i, i) = 0.
-
-Algorithm:
-  Initialise dist[i][j] from adjacency matrix (∞ for no edge, 0 on diagonal).
-  for k = 0 to V-1:
-    for i = 0 to V-1:
-      for j = 0 to V-1:
-        if dist[i][k] + dist[k][j] < dist[i][j]:
-          dist[i][j] = dist[i][k] + dist[k][j]
-
-Why k is outermost:
-  When computing dist_k, we need all values of dist_{k-1} to be
-  available. If k is the outer loop, the i-j updates for round k
-  correctly use values from round k-1 (in-place update is safe
-  because dist[i][k] and dist[k][j] don't change during round k).
-
-Time complexity: O(V^3) — three nested loops over V.
-Space complexity: O(V^2) — the distance matrix (can be done in-place).
-
-Handles negative weights (but not negative cycles).
-Detects negative cycles if dist[i][i] < 0 for any i after running.`,
     },
     complexity: {
       question: "",
@@ -798,21 +534,21 @@ Detects negative cycles if dist[i][i] < 0 for any i after running.`,
     source: "Never examined; Section B",
   },
 
-  // ── 14. Indexed Min-PQ for Dijkstra/Prim (Conceptual) ──
+  // ── 14. Decrease-Key for Dijkstra/Prim (Conceptual) ──
   {
     id: "graphs-indexed-pq-conceptual",
     type: "implement",
     topic: "graphs",
     tier: "conceptual",
-    title: "Indexed Min-PQ for Dijkstra/Prim",
-    prompt: "Explain why Dijkstra's and Prim's algorithms need a decrease-key operation, what an indexed min-priority queue is, and how it provides efficient decrease-key. Compare the complexity with and without an indexed min-PQ.",
+    title: "Decrease-Key for Dijkstra/Prim",
+    prompt: "Explain why Dijkstra's and Prim's algorithms benefit from a decrease-key operation on the priority queue, how the PQ must be augmented to support it efficiently, and compare the resulting complexity with and without decrease-key.",
     hints: [
       "In Dijkstra/Prim, when we relax an edge to vertex w, we need to update w's priority if it's already in the PQ.",
-      "A standard binary heap doesn't support decrease-key efficiently because you can't find w's position in O(1).",
-      "An indexed min-PQ adds a position array: qp[v] = index of v in the heap. This allows O(1) lookup and O(log n) swim to restore heap order.",
+      "A plain binary heap doesn't support decrease-key efficiently because you can't find w's position in O(1).",
+      "Augment the heap with a position array: pos[v] = index of v in the heap. This allows O(1) lookup of w's position, then O(log n) bubble-up to restore heap order.",
     ],
     solutions: {
-      pseudocode: `Indexed Min-PQ — Why Dijkstra/Prim Need decrease-key:
+      pseudocode: `Why Dijkstra/Prim Need decrease-key:
 
 The problem:
   In Dijkstra's (and Prim's), when we relax edge v→w:
@@ -824,66 +560,32 @@ The problem:
     (a) Insert duplicate entries for w (lazy approach — O(E log E)),
     (b) Or do a linear scan to find and update w (O(V) per update).
 
-What is an Indexed Min-PQ?
-  A binary heap augmented with two extra arrays:
-    - keys[i] = priority of item i
-    - pq[k]   = which item is at heap position k
-    - qp[i]   = heap position of item i  (the INDEX array)
+How to support decrease-key efficiently:
+  Augment the binary heap with a position array so we can find a
+  vertex's heap position in O(1):
+
+    - keys[v] = priority of vertex v
+    - heap[k] = which vertex is at heap position k
+    - pos[v]  = heap position of vertex v  (the INDEX array)
 
   Key operations and their complexity:
-    insert(i, key):      O(log n)  — append + swim
-    delMin():            O(log n)  — swap root with last + sink
-    decreaseKey(i, key): O(log n)  — update keys[i], then swim(qp[i])
-    contains(i):         O(1)      — check if qp[i] is valid
+    insert(v, key):      O(log n)  — append + bubble-up
+    extractMin():        O(log n)  — swap root with last + bubble-down
+    decreaseKey(v, key): O(log n)  — update keys[v], then bubble-up(pos[v])
+    contains(v):         O(1)      — check if pos[v] is valid
 
-  The qp[] array is the crucial addition — it lets us find item i's
+  The pos[] array is the crucial addition — it lets us find vertex v's
   position in the heap in O(1), making decrease-key O(log n).
 
 Complexity comparison for Dijkstra:
-  With indexed min-PQ:  O(E log V) — E relaxations × O(log V) each
-  With lazy min-PQ:     O(E log E) — may have E entries in PQ
+  With decrease-key PQ: O(E log V) — E relaxations × O(log V) each
+  With lazy PQ:         O(E log E) — may have E entries in PQ
   Since log E ≤ 2 log V, lazy is at most 2x slower in practice.
 
 Why it matters:
-  The indexed min-PQ is the theoretically optimal approach. Prim's
-  eager version also uses it: each vertex appears in the PQ at most
-  once, and we decrease-key when we find a cheaper crossing edge.`,
-      python: `Indexed Min-PQ — Why Dijkstra/Prim Need decrease-key:
-
-The problem:
-  In Dijkstra's (and Prim's), when we relax edge v→w:
-    - If w is not yet in the PQ: insert w with its new priority.
-    - If w IS already in the PQ with a higher priority: we need to
-      DECREASE its key (update its priority to a lower value).
-
-  Without decrease-key, we must either:
-    (a) Insert duplicate entries for w (lazy approach — O(E log E)),
-    (b) Or do a linear scan to find and update w (O(V) per update).
-
-What is an Indexed Min-PQ?
-  A binary heap augmented with two extra arrays:
-    - keys[i] = priority of item i
-    - pq[k]   = which item is at heap position k
-    - qp[i]   = heap position of item i  (the INDEX array)
-
-  Key operations and their complexity:
-    insert(i, key):      O(log n)  — append + swim
-    delMin():            O(log n)  — swap root with last + sink
-    decreaseKey(i, key): O(log n)  — update keys[i], then swim(qp[i])
-    contains(i):         O(1)      — check if qp[i] is valid
-
-  The qp[] array is the crucial addition — it lets us find item i's
-  position in the heap in O(1), making decrease-key O(log n).
-
-Complexity comparison for Dijkstra:
-  With indexed min-PQ:  O(E log V) — E relaxations × O(log V) each
-  With lazy min-PQ:     O(E log E) — may have E entries in PQ
-  Since log E ≤ 2 log V, lazy is at most 2x slower in practice.
-
-Why it matters:
-  The indexed min-PQ is the theoretically optimal approach. Prim's
-  eager version also uses it: each vertex appears in the PQ at most
-  once, and we decrease-key when we find a cheaper crossing edge.`,
+  Supporting decrease-key is the theoretically optimal approach.
+  Prim's eager version also uses it: each vertex appears in the PQ
+  at most once, and we decrease-key when we find a cheaper crossing edge.`,
     },
     complexity: {
       question: "",
@@ -935,7 +637,7 @@ Why it matters:
     prompt: "Trace BFS on the following undirected graph starting from vertex 0. Process adjacency lists in numerical order. Show the queue state and vertex dequeued at each step.\n\nAdjacency lists:\n0: [1, 3]\n1: [0, 2, 3]\n2: [1, 4]\n3: [0, 1, 4]\n4: [2, 3]",
     inputData: "5 vertices (undirected). Edges: 0-1, 0-3, 1-2, 1-3, 2-4, 3-4. Start: vertex 0.",
     table: {
-      columns: ["Step", "Dequeued", "Queue after enqueuing neighbours", "distTo[]"],
+      columns: ["Step", "Dequeued", "Queue after enqueuing neighbours", "distToSource[]"],
       rows: 5,
       solution: [
         ["1", "0", "[1, 3]", "[0, 1, -, 1, -]"],

@@ -23,8 +23,7 @@ export default function RoundScreen() {
   const location = useLocation()
   const storage = useStorage()
   const round = useRound(storage)
-  const language = storage.getLanguage()
-  const [editorFocused, setEditorFocused] = useState(false)
+  const [, setEditorFocused] = useState(false)
   const [userCode, setUserCode] = useState('')
   const editorContainerRef = useRef<HTMLDivElement>(null)
 
@@ -117,9 +116,9 @@ export default function RoundScreen() {
   const handleCopyForClaude = useCallback(() => {
     if (!round.currentQuestion || round.currentQuestion.type !== 'implement') return
     const q = round.currentQuestion as ImplementationQuestion
-    const text = formatCopyForClaude(q.prompt, userCode, q.solutions[language])
+    const text = formatCopyForClaude(q.prompt, userCode, q.solutions.pseudocode)
     navigator.clipboard.writeText(text)
-  }, [round.currentQuestion, userCode, language])
+  }, [round.currentQuestion, userCode])
 
   // Keyboard shortcuts
   useKeyboard({
@@ -236,7 +235,6 @@ export default function RoundScreen() {
             />
           ) : isImplement ? (
             <CodeEditor
-              language={language}
               onChange={setUserCode}
               onFocusChange={setEditorFocused}
             />
@@ -259,12 +257,12 @@ export default function RoundScreen() {
       {/* ── Revealed: Implementation ── */}
       {round.state.phase === 'revealed' && implQ && (
         <div>
-          <RevealPanel question={implQ} userCode={userCode} language={language} />
+          <RevealPanel question={implQ} userCode={userCode} />
           <div className="mt-4 flex items-center justify-between">
             <CopyForClaude
               questionPrompt={implQ.prompt}
               userCode={userCode}
-              modelAnswer={implQ.solutions[language]}
+              modelAnswer={implQ.solutions.pseudocode}
             />
             {round.canUndo && (
               <button onClick={round.undo} className="text-sm text-slate-500 hover:text-slate-300 transition-colors">

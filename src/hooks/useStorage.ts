@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, ReactNode, createElement } from 'react'
+import { createContext, useContext, useState, createElement, type ReactNode } from 'react'
 import type { MasteryState } from '../data/schema'
 
 const PREFIX = 'algodrill_v1_'
@@ -11,8 +11,6 @@ export interface StorageAPI {
   incrementMissCount: (questionId: string) => void
   getStarred: () => Set<string>
   toggleStar: (questionId: string) => void
-  getLanguage: () => 'pseudocode' | 'python'
-  setLanguage: (lang: 'pseudocode' | 'python') => void
   getStreak: () => { current: number; lastDate: string }
   recordStudyDay: () => void
   saveMidRound: (state: unknown) => void
@@ -60,12 +58,6 @@ function createStorageAPI(): StorageAPI {
       if (idx >= 0) starred.splice(idx, 1)
       else starred.push(questionId)
       writeJSON('starred', starred)
-    },
-    getLanguage(): 'pseudocode' | 'python' {
-      return readJSON<'pseudocode' | 'python'>('language', 'pseudocode')
-    },
-    setLanguage(lang: 'pseudocode' | 'python') {
-      writeJSON('language', lang)
     },
     getStreak() {
       return readJSON('streak', { current: 0, lastDate: '' })

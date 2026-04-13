@@ -23,12 +23,6 @@ export const sortingQuestions: (ImplementationQuestion | TableTraceQuestion)[] =
 for(j=i; j>0; j--)
      if (a[j] < a[j-1])
           swap(a[j], a[j-1])`,
-      python: `def insertion_sort(a: list) -> None:
-    for i in range(1, len(a)):
-        j = i
-        while j > 0 and a[j] < a[j - 1]:
-            a[j], a[j - 1] = a[j - 1], a[j]
-            j -= 1`,
     },
     complexity: {
       question: "What is the time complexity of insertion sort in the best, average, and worst case?",
@@ -56,14 +50,6 @@ min=i
 for(j=i+1; j<N; j++)
      if (a[j] < a[min]) min = j
 swap(a[i], a[min])`,
-      python: `def selection_sort(a: list) -> None:
-    n = len(a)
-    for i in range(n - 1):
-        min_idx = i
-        for j in range(i + 1, n):
-            if a[j] < a[min_idx]:
-                min_idx = j
-        a[i], a[min_idx] = a[min_idx], a[i]`,
     },
     complexity: {
       question: "What is the time complexity of selection sort? Does it depend on input order?",
@@ -105,31 +91,6 @@ merge(a[], aux[], lo, mid, hi):
           else if (j > hi)          a[k] = aux[i]; i++;
           else if (aux[j] < aux[i]) a[k] = aux[j]; j++;
           else                      a[k] = aux[i]; i++;`,
-      python: `def merge_sort(a: list) -> None:
-    aux = [0] * len(a)
-    _sort(a, aux, 0, len(a) - 1)
-
-def _sort(a: list, aux: list, lo: int, hi: int) -> None:
-    if hi <= lo:
-        return
-    mid = lo + (hi - lo) // 2
-    _sort(a, aux, lo, mid)
-    _sort(a, aux, mid + 1, hi)
-    _merge(a, aux, lo, mid, hi)
-
-def _merge(a: list, aux: list, lo: int, mid: int, hi: int) -> None:
-    for k in range(lo, hi + 1):
-        aux[k] = a[k]
-    i, j = lo, mid + 1
-    for k in range(lo, hi + 1):
-        if i > mid:
-            a[k] = aux[j]; j += 1
-        elif j > hi:
-            a[k] = aux[i]; i += 1
-        elif aux[j] < aux[i]:
-            a[k] = aux[j]; j += 1
-        else:
-            a[k] = aux[i]; i += 1`,
     },
     complexity: {
       question: "What is the time and space complexity of top-down merge sort?",
@@ -162,19 +123,6 @@ def _merge(a: list, aux: list, lo: int, mid: int, hi: int) -> None:
           else if (j > hi)          a[k] = aux[i]; i++;
           else if (aux[j] < aux[i]) a[k] = aux[j]; j++;
           else                      a[k] = aux[i]; i++;`,
-      python: `def merge(a: list, aux: list, lo: int, mid: int, hi: int) -> None:
-    for k in range(lo, hi + 1):
-        aux[k] = a[k]
-    i, j = lo, mid + 1
-    for k in range(lo, hi + 1):
-        if i > mid:
-            a[k] = aux[j]; j += 1
-        elif j > hi:
-            a[k] = aux[i]; i += 1
-        elif aux[j] < aux[i]:
-            a[k] = aux[j]; j += 1
-        else:
-            a[k] = aux[i]; i += 1`,
     },
     complexity: {
       question: "What is the time and space complexity of the merge subroutine?",
@@ -206,32 +154,6 @@ def _merge(a: list, aux: list, lo: int, mid: int, hi: int) -> None:
       hi = min(lo + 2*width - 1, n - 1)
       merge(a, aux, lo, mid, hi)
     width = width * 2`,
-      python: `def merge_sort_bu(a: list) -> None:
-    n = len(a)
-    aux = [0] * n
-    width = 1
-    while width < n:
-        lo = 0
-        while lo < n - width:
-            mid = lo + width - 1
-            hi = min(lo + 2 * width - 1, n - 1)
-            _merge(a, aux, lo, mid, hi)
-            lo += 2 * width
-        width *= 2
-
-def _merge(a: list, aux: list, lo: int, mid: int, hi: int) -> None:
-    for k in range(lo, hi + 1):
-        aux[k] = a[k]
-    i, j = lo, mid + 1
-    for k in range(lo, hi + 1):
-        if i > mid:
-            a[k] = aux[j]; j += 1
-        elif j > hi:
-            a[k] = aux[i]; i += 1
-        elif aux[j] < aux[i]:
-            a[k] = aux[j]; j += 1
-        else:
-            a[k] = aux[i]; i += 1`,
     },
     complexity: {
       question: "What is the time and space complexity of bottom-up merge sort? How does it compare to top-down?",
@@ -276,32 +198,6 @@ partition(a[], lo, hi):
           swap(a[i], a[j]);
      swap(a[lo], a[j]);
      return j;`,
-      python: `def quick_sort(a: list) -> None:
-    _qsort(a, 0, len(a) - 1)
-
-def _qsort(a: list, lo: int, hi: int) -> None:
-    if hi <= lo:
-        return
-    j = _partition(a, lo, hi)
-    _qsort(a, lo, j - 1)
-    _qsort(a, j + 1, hi)
-
-def _partition(a: list, lo: int, hi: int) -> int:
-    pivot = a[lo]
-    i = lo + 1
-    j = hi
-    while True:
-        while i <= hi and a[i] < pivot:
-            i += 1
-        while j >= lo and a[j] > pivot:
-            j -= 1
-        if i >= j:
-            break
-        a[i], a[j] = a[j], a[i]
-        i += 1
-        j -= 1
-    a[lo], a[j] = a[j], a[lo]
-    return j`,
     },
     complexity: {
       question: "What is the time complexity of QuickSort in the best, average, and worst case? When does the worst case occur?",
@@ -337,22 +233,6 @@ def _partition(a: list, lo: int, hi: int) -> int:
           swap(a[i], a[j]);
      swap(a[lo], a[j]);
      return j;`,
-      python: `def partition(a: list, lo: int, hi: int) -> int:
-    pivot = a[lo]
-    i = lo + 1
-    j = hi
-    while True:
-        while i <= hi and a[i] < pivot:
-            i += 1
-        while j >= lo and a[j] > pivot:
-            j -= 1
-        if i >= j:
-            break
-        a[i], a[j] = a[j], a[i]
-        i += 1
-        j -= 1
-    a[lo], a[j] = a[j], a[lo]
-    return j`,
     },
     complexity: {
       question: "What is the time complexity of the partition subroutine?",
@@ -384,15 +264,6 @@ def _partition(a: list, lo: int, hi: int) -> int:
       swap(a[i], a[j])
   swap(a[i + 1], a[hi])
   return i + 1`,
-      python: `def partition(a: list, lo: int, hi: int) -> int:
-    pivot = a[hi]
-    i = lo - 1
-    for j in range(lo, hi):
-        if a[j] <= pivot:
-            i += 1
-            a[i], a[j] = a[j], a[i]
-    a[i + 1], a[hi] = a[hi], a[i + 1]
-    return i + 1`,
     },
     complexity: {
       question: "How does Lomuto partition compare to Hoare's two-pointer partition?",
@@ -431,38 +302,6 @@ def _partition(a: list, lo: int, hi: int) -> int:
     else:
       stack.push((j + 1, hi))
       stack.push((lo, j - 1))`,
-      python: `def quick_sort_iterative(a: list) -> None:
-    stack = [(0, len(a) - 1)]
-    while stack:
-        lo, hi = stack.pop()
-        if hi <= lo:
-            continue
-        j = _partition(a, lo, hi)
-        # push larger partition first (processed last)
-        # so smaller partition is processed first -> O(log n) stack
-        if (j - lo) > (hi - j):
-            stack.append((lo, j - 1))
-            stack.append((j + 1, hi))
-        else:
-            stack.append((j + 1, hi))
-            stack.append((lo, j - 1))
-
-def _partition(a: list, lo: int, hi: int) -> int:
-    pivot = a[lo]
-    i = lo + 1
-    j = hi
-    while True:
-        while i <= hi and a[i] < pivot:
-            i += 1
-        while j >= lo and a[j] > pivot:
-            j -= 1
-        if i >= j:
-            break
-        a[i], a[j] = a[j], a[i]
-        i += 1
-        j -= 1
-    a[lo], a[j] = a[j], a[lo]
-    return j`,
     },
     complexity: {
       question: "Why does pushing the larger partition first guarantee O(log n) stack space?",
@@ -478,24 +317,24 @@ def _partition(a: list, lo: int, hi: int) -> int:
     topic: "sorting",
     tier: "full",
     title: "HeapSort",
-    prompt: "Implement heap sort using a 1-indexed max-heap in-place. Phase 1: build the max-heap by calling sink from n/2 down to 1. Phase 2: repeatedly swap the root (max) with the last unsorted element and sink to restore the heap.",
+    prompt: "Implement heap sort using a 1-indexed max-heap in-place. Phase 1: build the max-heap by calling bubble-down from n/2 down to 1. Phase 2: repeatedly swap the root (max) with the last unsorted element and bubble-down to restore the heap.",
     hints: [
-      "Function signatures: heapSort(a[], n) and sink(a[], k, n). Use 1-indexed array (a[1] to a[n]).",
-      "Build phase: for k = n/2 down to 1, call sink(a, k, n). Sort-down phase: while n > 1, swap a[1] with a[n], decrement n, sink(a, 1, n). sink: compare a[k] with its larger child a[2k] or a[2k+1], swap down if needed.",
-      "sink(a, k, n):\n  while 2*k <= n:\n    j = 2*k\n    if j < n and a[j] < a[j+1]: j++\n    if a[k] >= a[j]: break\n    swap(a[k], a[j])\n    k = j",
+      "Function signatures: heapSort(a[], n) and bubbleDown(a[], k, n). Use 1-indexed array (a[1] to a[n]).",
+      "Build phase: for k = n/2 down to 1, call bubbleDown(a, k, n). Sort-down phase: while n > 1, swap a[1] with a[n], decrement n, bubbleDown(a, 1, n). bubble-down: compare a[k] with its larger child a[2k] or a[2k+1], swap down if needed.",
+      "bubbleDown(a, k, n):\n  while 2*k <= n:\n    j = 2*k\n    if j < n and a[j] < a[j+1]: j++\n    if a[k] >= a[j]: break\n    swap(a[k], a[j])\n    k = j",
     ],
     solutions: {
       pseudocode: `function heapSort(a[], n):
   // Phase 1: build max-heap (1-indexed)
   for k = n/2 down to 1:
-    sink(a, k, n)
+    bubbleDown(a, k, n)
   // Phase 2: sort-down
   while n > 1:
     swap(a[1], a[n])
     n = n - 1
-    sink(a, 1, n)
+    bubbleDown(a, 1, n)
 
-function sink(a[], k, n):
+function bubbleDown(a[], k, n):
   while 2*k <= n:
     j = 2*k
     if j < n and a[j] < a[j+1]:
@@ -504,33 +343,10 @@ function sink(a[], k, n):
       break
     swap(a[k], a[j])
     k = j`,
-      python: `def heap_sort(a: list) -> None:
-    """Sorts a[1..n] in-place. a[0] is unused (1-indexed)."""
-    n = len(a) - 1  # last valid index
-
-    # Phase 1: build max-heap
-    for k in range(n // 2, 0, -1):
-        _sink(a, k, n)
-
-    # Phase 2: sort-down
-    while n > 1:
-        a[1], a[n] = a[n], a[1]
-        n -= 1
-        _sink(a, 1, n)
-
-def _sink(a: list, k: int, n: int) -> None:
-    while 2 * k <= n:
-        j = 2 * k
-        if j < n and a[j] < a[j + 1]:
-            j += 1
-        if a[k] >= a[j]:
-            break
-        a[k], a[j] = a[j], a[k]
-        k = j`,
     },
     complexity: {
       question: "What is the time complexity of heap sort? What makes the build phase O(n) rather than O(n log n)?",
-      answer: "Overall: O(n log n). Build phase: O(n) — most nodes are near the bottom and sink a short distance. Formally, sum of (n/2^(h+1)) * O(h) for h = 0 to log n converges to O(n). Sort-down phase: O(n log n) — n extractions each requiring O(log n) sink. Space: O(1) — in-place.",
+      answer: "Overall: O(n log n). Build phase: O(n) — most nodes are near the bottom and bubble-down a short distance. Formally, sum of (n/2^(h+1)) * O(h) for h = 0 to log n converges to O(n). Sort-down phase: O(n log n) — n extractions each requiring O(log n) bubble-down. Space: O(1) — in-place.",
     },
     source: "18-19 Q4f, 21-22 LSA Q2b, 21-22 Practice Q1a",
   },
@@ -580,50 +396,6 @@ function quickSortIterative(a[], n):
     j = partition(a, lo, hi)
     stack.push((j + 1, hi))   // right half (pushed first)
     stack.push((lo, j - 1))   // left half (pushed second, processed first)`,
-      python: `# ── Generic pattern ──
-# Recursive:
-#   def solve(args):
-#       if base_case(args): return
-#       # do work
-#       solve(sub_args_1)
-#       solve(sub_args_2)
-#
-# Iterative:
-def solve_iterative(initial_args):
-    stack = [initial_args]
-    while stack:
-        args = stack.pop()
-        if base_case(args):
-            continue
-        # do work
-        stack.append(sub_args_2)  # pushed first, processed last
-        stack.append(sub_args_1)  # pushed second, processed first
-
-# ── Concrete example: QuickSort ──
-def quick_sort_iterative(a: list) -> None:
-    stack = [(0, len(a) - 1)]
-    while stack:
-        lo, hi = stack.pop()
-        if hi <= lo:
-            continue
-        j = _partition(a, lo, hi)
-        stack.append((j + 1, hi))  # right half
-        stack.append((lo, j - 1))  # left half (processed first)
-
-def _partition(a: list, lo: int, hi: int) -> int:
-    pivot = a[lo]
-    i, j = lo + 1, hi
-    while True:
-        while i <= hi and a[i] < pivot:
-            i += 1
-        while j >= lo and a[j] > pivot:
-            j -= 1
-        if i >= j:
-            break
-        a[i], a[j] = a[j], a[i]
-        i += 1; j -= 1
-    a[lo], a[j] = a[j], a[lo]
-    return j`,
     },
     complexity: {
       question: "What are the trade-offs of iterative vs recursive implementations?",
@@ -675,33 +447,6 @@ key distribution.
 
 Time complexity: O(n) for a single partition pass (each element is
 examined at most once — i only moves right, gt only moves left).`,
-      python: `"""
-The 3-way partition (Dutch National Flag problem, Dijkstra) partitions an
-array into three regions around a pivot value v:
-  - a[lo..lt-1]   : elements < v
-  - a[lt..gt]      : elements == v
-  - a[gt+1..hi]    : elements > v
-
-Algorithm:
-  lt = lo, i = lo, gt = hi
-  pivot = a[lo]
-  while i <= gt:
-      if a[i] < pivot:    swap a[lt], a[i]; lt++; i++
-      elif a[i] > pivot:  swap a[i], a[gt]; gt--
-      else:               i++
-
-Why it helps with duplicates:
-Standard 2-way partition puts one pivot in its final position per call.
-If the array has many duplicates, those equal elements still get recursed
-into. 3-way partition groups ALL elements equal to the pivot in the
-middle -- they are excluded from further recursion. This makes 3-way
-QuickSort linear O(n) on arrays where every element is the same, and
-O(n log n) in general. Entropy-optimal: proportional to the Shannon
-entropy of the key distribution.
-
-Time complexity: O(n) for a single partition pass (each element is
-examined at most once -- i only moves right, gt only moves left).
-"""`,
     },
     complexity: {
       question: "",
@@ -839,25 +584,25 @@ examined at most once -- i only moves right, gt only moves left).
     topic: "sorting",
     tier: "full",
     title: "HeapSort Trace (Build + Sort-down)",
-    prompt: "Trace heap sort on the array [4, 10, 3, 5, 1] (1-indexed: a[1]=4, a[2]=10, a[3]=3, a[4]=5, a[5]=1). Show the array state after each sink during the build phase, and after each swap+sink during the sort-down phase.",
+    prompt: "Trace heap sort on the array [4, 10, 3, 5, 1] (1-indexed: a[1]=4, a[2]=10, a[3]=3, a[4]=5, a[5]=1). Show the array state after each bubble-down during the build phase, and after each swap+bubble-down during the sort-down phase.",
     inputData: "[_, 4, 10, 3, 5, 1] (1-indexed)",
     table: {
       columns: ["Phase", "Operation", "Array State (1-indexed)"],
       rows: 7,
       solution: [
         ["Build", "Initial", "4, 10, 3, 5, 1"],
-        ["Build", "sink(2): 10 > children, no change", "4, 10, 3, 5, 1"],
-        ["Build", "sink(1): swap 4↔10, then swap 4↔5", "10, 5, 3, 4, 1"],
-        ["Sort", "swap a[1]↔a[5], sink(1) in n=4", "5, 4, 3, 1, | 10"],
-        ["Sort", "swap a[1]↔a[4], sink(1) in n=3", "4, 1, 3, | 5, 10"],
-        ["Sort", "swap a[1]↔a[3], sink(1) in n=2", "3, 1, | 4, 5, 10"],
+        ["Build", "bubble-down(2): 10 > children, no change", "4, 10, 3, 5, 1"],
+        ["Build", "bubble-down(1): swap 4↔10, then swap 4↔5", "10, 5, 3, 4, 1"],
+        ["Sort", "swap a[1]↔a[5], bubble-down(1) in n=4", "5, 4, 3, 1, | 10"],
+        ["Sort", "swap a[1]↔a[4], bubble-down(1) in n=3", "4, 1, 3, | 5, 10"],
+        ["Sort", "swap a[1]↔a[3], bubble-down(1) in n=2", "3, 1, | 4, 5, 10"],
         ["Sort", "swap a[1]↔a[2], done", "1, | 3, 4, 5, 10"],
       ],
     },
     hints: [
-      "Build phase: sink from n/2 = 2 down to 1. sink(2): a[2]=10, children a[4]=5, a[5]=1. 10 is already >= both, no swap.",
-      "sink(1): a[1]=4, children a[2]=10, a[3]=3. Larger child is 10 at index 2. Swap 4↔10 → [10,4,3,5,1]. Now sink position 2: children a[4]=5, a[5]=1. Larger child is 5 at index 4. Swap 4↔5 → [10,5,3,4,1].",
-      "Sort-down: swap root 10 with last element 1 → [1,5,3,4,10]. Reduce n to 4. sink(1): 1 vs children 5,3 → swap with 5 → [5,1,3,4,10]. Then 1 vs child 4 → swap → [5,4,3,1,10].",
+      "Build phase: bubble-down from n/2 = 2 down to 1. bubble-down(2): a[2]=10, children a[4]=5, a[5]=1. 10 is already >= both, no swap.",
+      "bubble-down(1): a[1]=4, children a[2]=10, a[3]=3. Larger child is 10 at index 2. Swap 4↔10 → [10,4,3,5,1]. Now bubble-down position 2: children a[4]=5, a[5]=1. Larger child is 5 at index 4. Swap 4↔5 → [10,5,3,4,1].",
+      "Sort-down: swap root 10 with last element 1 → [1,5,3,4,10]. Reduce n to 4. bubble-down(1): 1 vs children 5,3 → swap with 5 → [5,1,3,4,10]. Then 1 vs child 4 → swap → [5,4,3,1,10].",
     ],
     source: "21-22 Practice Q1a (10 marks)",
   },
@@ -882,7 +627,7 @@ examined at most once -- i only moves right, gt only moves left).
       ],
     },
     hints: [
-      "LSD radix sort processes digits from least significant to most significant. Each pass uses a stable sort (key-indexed counting) on one digit position.",
+      "LSD radix sort processes digits from least significant to most significant. Each pass uses a stable sort (counting sort) on one digit position.",
       "Pass 1 (ones digit): Group by last digit: 0→[170,090], 2→[002,802], 4→[024], 5→[045,075], 6→[066]. Concatenate in order.",
       "Pass 2 (tens digit): Group by middle digit from the pass-1 result. Stability preserves the ones-digit ordering within each group. Pass 3 completes the sort.",
     ],

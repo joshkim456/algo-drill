@@ -85,7 +85,7 @@ src/
 | Topic | Implementation | Trace |
 |---|---|---|
 | Sorting | Insertion, selection, merge, quick, LSD/MSD radix | Partition traces, merge steps |
-| Heaps | Swim, sink, insert, delMax, heapsort | Heap operation traces |
+| Heaps | Bubble-up, bubble-down, insert, delete-max, heapsort | Heap operation traces |
 | BST | Search, insert, delete, floor, rank | BST construction |
 | LLRB Trees | Insert, rotations, color flips | LLRB construction with rebalancing |
 | Hash Tables | Linear probing, separate chaining, resize | Probing sequences |

@@ -4,11 +4,10 @@ import CodeEditor from './CodeEditor'
 interface RevealPanelProps {
   question: ImplementationQuestion
   userCode: string
-  language: 'pseudocode' | 'python'
 }
 
-export default function RevealPanel({ question, userCode, language }: RevealPanelProps) {
-  const modelAnswer = question.solutions[language]
+export default function RevealPanel({ question, userCode }: RevealPanelProps) {
+  const modelAnswer = question.solutions.pseudocode
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -17,7 +16,6 @@ export default function RevealPanel({ question, userCode, language }: RevealPane
         <CodeEditor
           value={userCode}
           readOnly
-          language={language}
         />
       </div>
       <div>
@@ -25,7 +23,6 @@ export default function RevealPanel({ question, userCode, language }: RevealPane
         <CodeEditor
           value={modelAnswer}
           readOnly
-          language={language}
         />
       </div>
     </div>

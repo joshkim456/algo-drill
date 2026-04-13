@@ -1,7 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react'
 import { EditorState } from '@codemirror/state'
 import { EditorView, keymap } from '@codemirror/view'
-import { python } from '@codemirror/lang-python'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { lineNumbers, highlightActiveLine, highlightActiveLineGutter } from '@codemirror/view'
@@ -13,7 +12,6 @@ interface CodeEditorProps {
   value?: string
   onChange?: (value: string) => void
   readOnly?: boolean
-  language: 'pseudocode' | 'python'
   placeholder?: string
   onFocusChange?: (focused: boolean) => void
 }
@@ -22,7 +20,6 @@ export default function CodeEditor({
   value = '',
   onChange,
   readOnly = false,
-  language,
   placeholder,
   onFocusChange,
 }: CodeEditorProps) {
@@ -56,11 +53,6 @@ export default function CodeEditor({
         }
       }),
     ]
-
-    // Add Python mode for python, basic for pseudocode
-    if (language === 'python') {
-      extensions.push(python())
-    }
 
     if (readOnly) {
       extensions.push(EditorState.readOnly.of(true))
@@ -100,7 +92,7 @@ export default function CodeEditor({
     }
     // Only recreate editor when readOnly or language changes, not on every value change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [readOnly, language])
+  }, [readOnly])
 
   // Expose a way to get the current value
   const getValue = useCallback(() => {

@@ -36,7 +36,6 @@ export interface ImplementationQuestion {
   hints: [string, string, string];
   solutions: {
     pseudocode: string;
-    python: string;
   };
   complexity: {
     question: string;

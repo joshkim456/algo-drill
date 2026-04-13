@@ -49,46 +49,6 @@ export const hashTableQuestions: (ImplementationQuestion | TableTraceQuestion)[]
                 return
             else x = x.next
         self.ht[i] = Node(key, value, self.ht[i])`,
-      python: `class Node:
-    def __init__(self, key, val, next_node=None):
-        self.key = key
-        self.val = val
-        self.next = next_node
-
-def put(table: list, M: int, key, val):
-    i = hash(key) % M
-    node = table[i]
-    while node is not None:
-        if node.key == key:
-            node.val = val
-            return
-        node = node.next
-    table[i] = Node(key, val, table[i])  # prepend
-
-def get(table: list, M: int, key):
-    i = hash(key) % M
-    node = table[i]
-    while node is not None:
-        if node.key == key:
-            return node.val
-        node = node.next
-    return None
-
-def delete(table: list, M: int, key):
-    i = hash(key) % M
-    if table[i] is None:
-        return
-    if table[i].key == key:
-        table[i] = table[i].next
-        return
-    prev = table[i]
-    curr = prev.next
-    while curr is not None:
-        if curr.key == key:
-            prev.next = curr.next
-            return
-        prev = curr
-        curr = curr.next`,
     },
     complexity: {
       question: "What is the expected time complexity of separate chaining operations, and how does load factor affect performance?",
@@ -136,49 +96,10 @@ def delete(table: list, M: int, key):
             else i=(i+1)%self.M
         self.ht_keys[i] = key
         self.ht_values[i] = value`,
-      python: `def put(keys: list, vals: list, M: int, key, val):
-    i = hash(key) % M
-    while keys[i] is not None:
-        if keys[i] == key:
-            vals[i] = val
-            return
-        i = (i + 1) % M
-    keys[i] = key
-    vals[i] = val
-
-def get(keys: list, vals: list, M: int, key):
-    i = hash(key) % M
-    while keys[i] is not None:
-        if keys[i] == key:
-            return vals[i]
-        i = (i + 1) % M
-    return None
-
-def delete(keys: list, vals: list, M: int, key):
-    # find the key
-    i = hash(key) % M
-    while keys[i] is not None:
-        if keys[i] == key:
-            break
-        i = (i + 1) % M
-    if keys[i] is None:
-        return  # key not found
-    # delete it
-    keys[i] = None
-    vals[i] = None
-    # rehash the rest of the cluster
-    j = (i + 1) % M
-    while keys[j] is not None:
-        rehash_key = keys[j]
-        rehash_val = vals[j]
-        keys[j] = None
-        vals[j] = None
-        put(keys, vals, M, rehash_key, rehash_val)
-        j = (j + 1) % M`,
     },
     complexity: {
       question: "What is the expected time complexity of linear probing insert and search?",
-      answer: "Expected O(1) with load factor α < 1. Average probes for search hit: ~½(1 + 1/(1-α)). Average probes for search miss: ~½(1 + 1/(1-α)²). Degrades as table fills. Worst case O(n) with clustering. Delete is O(n) worst case due to cluster rehashing.",
+      answer: "Expected O(1) with load factor α < 1. At half-full (α = 0.5), average number of probes is ~3/2. Performance degrades as α → 1. Worst case O(n) with clustering. Delete is O(n) worst case due to cluster rehashing.",
     },
     source: "21-22 Q2b, 21-22 Practice Q2b",
   },
@@ -237,41 +158,6 @@ Verification of G, A, C, B, D:
      [_,G,A,B,_,C,_]
   D: h=2, slot 2 occ (A), 3 occ (B), probe slot 4, empty → insert at 4.
      [_,G,A,B,D,C,_] ✓`,
-      python: `"""
-Reasoning approach:
-
-1. Identify keys at their home positions (no displacement):
-   - G: h(G)=1, at index 1 -> home position
-   - A: h(A)=2, at index 2 -> home position
-   - C: h(C)=5, at index 5 -> home position
-   These keys could have been inserted in any order relative
-   to each other (they don't interfere).
-
-2. Identify displaced keys and deduce ordering constraints:
-   - B: h(B)=2, at index 3 -> displaced by 1 probe.
-     Slot 2 must have been occupied -> A was inserted before B.
-   - D: h(D)=2, at index 4 -> displaced by 2 probes.
-     Slots 2 and 3 must have been occupied -> both A and B
-     were inserted before D.
-
-3. Ordering constraints: A before B, B before D.
-   G and C are independent (different hash chains).
-
-4. Valid insertion orders (among several):
-   - G, A, C, B, D
-   - A, G, B, C, D
-   - A, B, G, D, C
-   Any order satisfying A -> B -> D with G, C free.
-
-Verification of G, A, C, B, D:
-  G: h=1, slot 1 empty -> insert at 1.  [_,G,_,_,_,_,_]
-  A: h=2, slot 2 empty -> insert at 2.  [_,G,A,_,_,_,_]
-  C: h=5, slot 5 empty -> insert at 5.  [_,G,A,_,_,C,_]
-  B: h=2, slot 2 occ (A), probe slot 3, empty -> insert at 3.
-     [_,G,A,B,_,C,_]
-  D: h=2, slot 2 occ (A), 3 occ (B), probe slot 4, empty -> 4.
-     [_,G,A,B,D,C,_]  (matches target)
-"""`,
     },
     complexity: {
       question: "How many valid insertion orders exist in general for a given LP table state?",
@@ -335,45 +221,6 @@ Verification of G, A, C, B, D:
    - LP: when cache performance matters, when load factor
      is kept low (α ≤ 0.5), when memory allocation overhead
      should be avoided (no linked list nodes).`,
-      python: `"""
-1. LOAD FACTOR (alpha = n/M):
-   - Chaining: works for any alpha, even alpha > 1. Average
-     chain length is alpha. Performance degrades gracefully.
-   - LP: requires alpha < 1 (must have empty slots to
-     terminate probes). Performance degrades sharply as
-     alpha -> 1. Typically resize when alpha > 0.5 to 0.75.
-
-2. CLUSTERING:
-   - Chaining: no clustering. Each bucket is independent.
-     Collisions only affect keys with the same hash.
-   - LP: suffers from primary clustering. Long runs of
-     occupied slots form clusters. A new key hashing into
-     any slot in a cluster extends it, making it grow
-     faster -- a positive feedback loop.
-
-3. CACHE / MEMORY PERFORMANCE:
-   - Chaining: each node is a separate heap allocation.
-     Following next pointers causes cache misses.
-     Extra memory overhead per node (key + val + pointer).
-   - LP: keys stored in a contiguous array. Sequential
-     probing is cache-friendly (prefetching helps).
-     No pointer overhead. But table must be sparse
-     (wasted empty slots).
-
-4. DELETION:
-   - Chaining: simple -- remove node from linked list.
-     O(1) once found.
-   - LP: complex -- cannot just null out a slot (breaks
-     probe chains). Must either use tombstones (lazy
-     deletion) or rehash the rest of the cluster.
-
-5. WHEN TO CHOOSE:
-   - Chaining: when load factor may be high or unpredictable,
-     when deletion is frequent, when simplicity is valued.
-   - LP: when cache performance matters, when load factor
-     is kept low (alpha <= 0.5), when memory allocation
-     overhead should be avoided (no linked list nodes).
-"""`,
     },
     complexity: {
       question: "",
